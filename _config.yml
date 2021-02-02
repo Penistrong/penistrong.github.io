@@ -1,0 +1,117 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+#
+# If you need help with YAML syntax, here are some quick references for you:
+# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
+# https://learnxinyminutes.com/docs/yaml/
+#
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+
+title: Penistrong's Secret Blog
+SEOTitle: Penistrong的博客
+email: U201717014@hust.edu.cn
+description: >- # this means to ignore newlines until "baseurl:"
+  A normal postgraduate of HUST, WuHan.
+  Here are some conclusions of studying process in my UNiDays lol.
+keyword: "Penistrong, 陈立伟, blog"
+baseurl: "/blog" # the subpath of your site, e.g. /blog
+url: "www.penistrong.top" # the base hostname & protocol for your site, e.g. http://example.com
+header-img: img/home-bg.jpg
+
+# SNS settings
+RSS: false
+twitter_username:   Penistrong
+github_username:    Penistrong
+zhihu_username:     chen-li-wei-32-18
+
+# Build settings
+theme: minima
+highlighter: rouge
+permalink: pretty
+paginate: 10
+anchorjs: true                          # if you want to customize anchor. check out line:181 of `post.html`
+
+# Plugins
+# jekyll 4.2.0
+plugins:
+  - jekyll-feed
+  - jekyll-paginate   # If you use bundle to run jekyll, don't forget append [gem "jekyll-paginate", "~> 1.1.0"] in GemFile
+  - jekyll-spaceship  # For MathJax rendering
+
+# MarkDown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+
+# MathJax rendering for layout:page (e.g. post preview)
+page-mathjax: false
+
+# Analytics settings
+# Baidu Analytics
+ba_track_id: 4cc1f2d8f3067386cc5cdb626a202900
+# Google Analytics
+ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
+ga_domain: www.penistrong.top
+
+# Featured Tags
+featured-tags: true                     # whether or not using Feature-Tags
+featured-condition-size: 1              # A tag will be featured if the size of it is more than this condition value
+
+# Sidebar settings
+sidebar: true                           # whether or not using Sidebar.
+sidebar-about-description: "陈立伟，HUST SE，爪巴尔 <br> Penistrong wants to keep foolish."
+sidebar-avatar:  /img/avatar-Penistrong.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
+
+# Friends
+friends: [
+    {
+        title: "JiaXi Yang",
+        href: "http://www.jojo.fit/"
+    }
+]
+
+# Programs
+programs: [
+    {
+        title: "AutoAlbum",
+        href: "http://www.penistrong.top/users/login"
+    },
+]
+
+# Exclude from processing.
+# The following items will not be processed, by default.
+# Any item listed under the `exclude:` key here will be automatically added to
+# the internal "default list".
+#
+# Excluded items can be processed by explicitly listing the directories or
+# their entries' file path in the `include:` list.
+#
+# exclude:
+#   - .sass-cache/
+#   - .jekyll-cache/
+#   - gemfiles/
+#   - Gemfile
+#   - Gemfile.lock
+#   - node_modules/
+#   - vendor/bundle/
+#   - vendor/cache/
+#   - vendor/gems/
+#   - vendor/ruby/
+exclude:
+  - Gruntfile.js
+  - package.json
+  - README.md
+  - less
+  - node_modules
+  - nohup.out

@@ -1,0 +1,9 @@
+{% if site.programs %}
+<hr>
+<h5>PROGRAMS</h5>
+<ul class="list-inline">
+    {% for program in site.programs %}
+        <li><a href="{{program.href}}">{{program.title}}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
