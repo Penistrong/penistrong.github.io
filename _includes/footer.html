@@ -111,7 +111,8 @@
 </script>
 
 
-<!-- Google Analytics -->
+<!-- Google Analytics-Universal-Analytic-Outdated-->
+<!--
 {% if site.ga_track_id %}
 <script>
     // dynamic User by Penistrong
@@ -128,7 +129,23 @@
     ga('send', 'pageview');
 </script>
 {% endif %}
+-->
 
+<!-- Global site tag (gtag.js) - Google Analytics -GA4 -->
+{% if site.ga_track_id %}
+<script async src='{{ "https://www.googletagmanager.com/gtag/js?id=" | append:site.ga_track_id }}'></script>
+<script>
+    //Penistrong
+    var _gaId = '{{ site.ga_track_id }}';
+
+    //Original
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', _gaId);
+</script>
+{% endif %}
 
 <!-- Baidu Tongji -->
 {% if site.ba_track_id %}
