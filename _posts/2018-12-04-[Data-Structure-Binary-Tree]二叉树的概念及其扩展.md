@@ -378,7 +378,8 @@ void InOrderBiTreeByMorris(BiTree root) {
 	如上图这棵二叉树。首先，访问的是根结点F，其左儿子非空，所以需要先找到它的前驱结点（寻找路径为B->D->E），将E的右指针指向F，然后当前结点为B。依然需要找到B的前驱结点A，将A的右指针指向B，并将当前结点设置为A。下一步，输出A，并把当前结点设置为A的右儿子B。之后，会访问到B的前驱结点A指向B，那么令A的右指针为空，继续遍历B的右儿子，以此类推。
 
 ##### Morris先根周游版
-	与中序遍历类似，只是输出关键字的顺序不同
+  - 与中序遍历类似，只是输出关键字的顺序不同
+
 ```c
 void PreOrderBiTreeByMorris(BiTree root) {
 	if (root == NULL)
@@ -520,7 +521,6 @@ BiTree insertNode(BiTree curNode, int value) {
 }
 ```
 - **非递归版**
-
 ```c
 //非递归插入
 void insertNode_Ex(BiTree root, int value) {
@@ -547,9 +547,12 @@ void insertNode_Ex(BiTree root, int value) {
 
 ##### 删除delete
 - 思路：删除节点后，要调整各节点的位置(即改变指针引用)才能使剩下的节点组成的树仍为二叉查找树
-1.如果节点X是一片树叶（节点X没有儿子），直接删除该节点（父节点指向该节点的指针置空，接着释放内存）
-2.如果节点X有一个儿子，为父节点parentX调整指针绕过该节点指向节点X的子节点childX，接着操作同上。
-3.如果节点X有两个儿子。**删除策略**：用节点X的右子树中的最小元代替该节点的关键字值并递归地删除那个原最小元所在的节点。**分析**：右子树的最小元所在节点不可能有左儿子，此时调用前例情况1或2删除。
+- 1.如果节点X是一片树叶（节点X没有儿子），直接删除该节点（父节点指向该节点的指针置空，接着释放内存）
+- 2.如果节点X有一个儿子，为父节点parentX调整指针绕过该节点指向节点X的子节点childX，接着操作同上。
+- 3.如果节点X有两个儿子。
+  - **删除策略**：用节点X的右子树中的最小元代替该节点的关键字值并递归地删除那个原最小元所在的节点。
+  - **分析**：右子树的最小元所在节点不可能有左儿子，此时调用前例情况1或2删除。
+
 ```c
 BiTree deleteNode(BiTree curNode, int value) {
 	BiTree tempNode;
@@ -578,6 +581,7 @@ BiTree deleteNode(BiTree curNode, int value) {
 
 ##### 查找find
 - 给定要寻找的节点的关键字和树的根节点指针，只需根据二叉查找树的性质递归找到该节点
+
 ```c
 //find操作
 BiTree find(BiTree curNode, int value) {
