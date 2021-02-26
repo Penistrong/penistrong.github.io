@@ -7,6 +7,7 @@ date:       2018-12-04 10:38:08 +0800
 header-img: "img/post-bg/"
 categories: jekyll update
 catalog: true
+mathjax: true
 tags:
     - DataStructure
     - note
