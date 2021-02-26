@@ -642,37 +642,37 @@ int updateNode(BiTree root, int src, int dst) {
 令 D(N) 是具有N个节点的某棵树T的内部路径长，D(1) = 0。一颗 N 节点树是由一颗 i 节点左子树和一颗 (N - i - 1) 节点右子树以及深度为0的一个根节点组成，其中0 <= i <= N，D(i) 为根的左子树的内部路径长。但是在原树中，所有这些节点都要加深一度。同样的结论对于右子树依然成立。如此可得递归关系:
 $$	D(N)=D(i)+D(N-i-1)+N-1$$
 如果所有子树的大小等可能地出现(对于ADT是成立的，子树的大小只依赖于第一个插入到树中的元素的相对的秩，而对于普通二叉树则不成立)，那么 D(i) 和 D(N - i - 1)的平均值都是$\frac{1}{N}\sum_{j=0}^{N-1} D(j)$。于是则有：
-$$  D(N) = \frac{2}{N}[\sum_{j=0}^{N-1} D(j)]+N-1$$ 
+$$  D(N) = \frac{2}{N}[\sum_{j=0}^{N-1} D(j)]+N-1 $$ 
 <center>简化上式以方便分析</center>
 
-$$  T(N) = \frac{2}{N}[\sum_{j=0}^{N-1} T(j)]+cN$$ 
+$$  T(N) = \frac{2}{N}[\sum_{j=0}^{N-1} T(j)]+cN $$ 
 <center>用N乘以上式</center>
 
-$$  NT(N)=2[\sum_{j=0}^{N-1} T(j)]+cN^2$$
+$$  NT(N)=2[\sum_{j=0}^{N-1} T(j)]+cN^2 $$
 <center>用 N=N-1替换上式中的N</center>
 
-$$  (N-1)T(N-1) = 2[\sum_{j=0}^{N-2} T(j)]+c(N-1)^2$$
+$$  (N-1)T(N-1) = 2[\sum_{j=0}^{N-2} T(j)]+c(N-1)^2 $$
 <center>上述两式作差除去求和符号</center>
 
-$$  NT(N)-(N-1)T(N-1)=2T(N-1)+2cN-c$$
+$$  NT(N)-(N-1)T(N-1)=2T(N-1)+2cN-c $$
 <center>移项、合并并除去右边无关紧要的常数c</center>
 
-$$  NT(N)=(N+1)T(N-1)+2cN$$
-$$  \frac{T(N)}{N+1}=\frac{T(N-1)}{N}+\frac{2c}{N+1}$$
+$$  NT(N)=(N+1)T(N-1)+2cN $$
+$$  \frac{T(N)}{N+1}=\frac{T(N-1)}{N}+\frac{2c}{N+1} $$
 <center>进行叠缩</center>
 
-$$  \frac{T(N-1)}{N}=\frac{T(N-2)}{N-1}+\frac{2c}{N}$$
-$$  \frac{T(N-2)}{N-1}=\frac{T(N-3)}{N-2}+\frac{2c}{N-1}$$
-$$  ...$$
-$$  \frac{T(2)}{3}=\frac{T(1)}{2}+\frac{2c}{3}$$
+$$  \frac{T(N-1)}{N}=\frac{T(N-2)}{N-1}+\frac{2c}{N} $$
+$$  \frac{T(N-2)}{N-1}=\frac{T(N-3)}{N-2}+\frac{2c}{N-1} $$
+$$  ... $$
+$$  \frac{T(2)}{3}=\frac{T(1)}{2}+\frac{2c}{3} $$
 <center>前述式子逐项相加</center>
 
-$$  \frac{T(N)}{N+1}=\frac{T(1)}{2}+2c\sum_{i=3}^{N+1} \frac{1}{i}≈ln (N+1) + γ -\frac{3}{2}$$
-$$  欧拉常数(Euler's\space constant) γ≈0.577$$
+$$  \frac{T(N)}{N+1}=\frac{T(1)}{2}+2c\sum_{i=3}^{N+1} \frac{1}{i}≈ln (N+1) + γ -\frac{3}{2} $$
+$$  欧拉常数(Euler's\space constant) γ≈0.577 $$
 <center>于是立刻有</center>
 
-$$  \frac{T(N)}{N+1} = O(log N)$$
-$$  T(N) = O(Nlog N)$$
+$$  \frac{T(N)}{N+1} = O(log N) $$
+$$  T(N) = O(Nlog N) $$
 
 - **结论**：得到的二叉查找树平均内部路径长为$D(N)=O(NlogN)$。因此任意节点的期望深度为$d(N)=O(logN)$。
 
