@@ -47,7 +47,7 @@ anchorjs: true                          # if you want to customize anchor. check
 plugins:
   - jekyll-feed
   - jekyll-paginate   # If you use bundle to run jekyll, don't forget append [gem "jekyll-paginate", "~> 1.1.0"] in GemFile
-  - jekyll-spaceship  # For MathJax rendering
+  # - jekyll-spaceship  # For MathJax rendering.Now I choose MathJax or KaTex as rendering LaTex.
 
 # MarkDown settings
 markdown: kramdown
