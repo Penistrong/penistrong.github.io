@@ -47,7 +47,7 @@ tags:
     }
     ```
     
-    - 由于html中各文件的链接通过`{{ file_path | prepend site.baseurl }}`拼接而成。注意在jekyll的`_config.yml`中的`baseurl`指定的是自己博客在网站下的子目录。由于github.io的主页就是博客，在github.io里`baseurl = ""`，在VPS上因为还要部署其他应用，因此使用`/blog`作为subpath，即`baseurl="/blog"`。
+    - 由于html中各文件的链接通过` file_path | prepend site.baseurl `拼接而成。注意在jekyll的`_config.yml`中的`baseurl`指定的是自己博客在网站下的子目录。由于github.io的主页就是博客，在github.io里`baseurl = ""`，在VPS上因为还要部署其他应用，因此使用`/blog`作为subpath，即`baseurl="/blog"`。
 
     ```yaml
     # penistrong.github.io _config.yml
