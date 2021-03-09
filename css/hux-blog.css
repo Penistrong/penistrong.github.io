@@ -809,21 +809,35 @@ body {
   webkit-tap-highlight-color: #0085a1;
 }
 /* Hux add tags support */
+/* 用于Archive页面和Tags页面点击标签隐藏非标签分类的博文 */
+.d-none{
+  display: none !important;
+}
 .tags {
   margin-bottom: -5px;
+}
+.tags.tags-sup a,
+.tags.tags-sup .tag {
+  padding: 0 10px 0 12px;
 }
 .tags a,
 .tags .tag {
   display: inline-block;
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 999em;
-  padding: 0 10px;
+  padding: 0 10px 0 10px;
   color: #ffffff;
   line-height: 24px;
   font-size: 12px;
   text-decoration: none;
   margin: 0 1px;
   margin-bottom: 6px;
+  cursor: pointer;
+}
+.tags a > sup,
+.tags .tag > sup {
+  margin-left: -2px;
+  font-weight: 700;
 }
 .tags a:hover,
 .tags .tag:hover,
@@ -858,13 +872,31 @@ body {
   line-height: 28px;
   margin: 0 2px;
   margin-bottom: 8px;
-  background: #D6D6D6;
+  background: #f3f5f5;
 }
 #tag_cloud a:hover,
 #tag_cloud .tag:hover,
 #tag_cloud a:active,
+#tag_cloud a.focus,
 #tag_cloud .tag:active {
   background-color: #0085a1 !important;
+}
+#tag_cloud a.focus,
+#tag_cloud .tag.focus {
+  box-shadow: rgba(0, 0, 0, 0.117647) 0 1px 6px, rgba(0, 0, 0, 0.239216) 0 1px 4px;
+}
+#tag_cloud a.tag-button--all,
+#tag_cloud .tag.tag-button--all {
+  font-weight: 700;
+  color: #0085a1 !important;
+}
+#tag_cloud a.tag-button--all:hover,
+#tag_cloud .tag.tag-button--all:hover,
+#tag_cloud a.tag-button--all:active,
+#tag_cloud .tag.tag-button--all:active,
+#tag_cloud a.tag-button--all.focus,
+#tag_cloud .tag.tag-button--all.focus {
+  background-color: #e4e4e4 !important;
 }
 @media only screen and (min-width: 768px) {
   #tag_cloud {
@@ -895,6 +927,54 @@ body {
     line-height: 2 !important;
   }
 }
+/* Archive support begin */
+.mini-post-list {
+  margin: 20px 0 15px 0;
+}
+.mini-post-list .tag-text {
+  font-weight: 200;
+  /* Hux learn from
+     *     TypeIsBeautiful,
+     *     [This Post](http://zhuanlan.zhihu.com/ibuick/20186806) etc.
+     */
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Arial", "PingFang SC", "Hiragino Sans GB", "STHeiti", "Microsoft YaHei", "Microsoft JhengHei", "Source Han Sans SC", "Noto Sans CJK SC", "Source Han Sans CN", "Noto Sans SC", "Source Han Sans TC", "Noto Sans CJK TC", "WenQuanYi Micro Hei", SimSun, sans-serif;
+  line-height: 1.7;
+}
+.mini-post-list .post-preview {
+  position: relative;
+}
+.mini-post-list .post-preview > a .post-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 20px;
+}
+.mini-post-list .post-preview > a .post-subtitle {
+  font-size: 13px;
+}
+.mini-post-list .post-preview > .post-meta {
+  position: absolute;
+  right: 5px;
+  bottom: 0px;
+  margin: 0px;
+  font-size: 12px;
+  line-height: 12px;
+}
+@media only screen and (min-width: 768px) {
+  .mini-post-list .post-preview {
+    margin-left: 20px;
+  }
+  .mini-post-list .post-preview > a > .post-title {
+    font-size: 18px;
+    line-height: 1.3;
+  }
+  .mini-post-list .post-preview > a > .post-subtitle {
+    font-size: 14px;
+  }
+  .mini-post-list .post-preview .post-meta {
+    font-size: 18px;
+  }
+}
+/* Archive support End*/
 .one-tag-list .tag-text {
   font-weight: 200;
   /* Hux learn from
