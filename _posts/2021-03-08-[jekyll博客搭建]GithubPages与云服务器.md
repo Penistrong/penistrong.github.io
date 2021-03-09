@@ -39,12 +39,24 @@ tags:
     nohup jekyll build --source /usr/workspace/penistrong.github.io --destination /www/wwwroot/www.penistrong.top/blog_site --incremental --watch
     ```
 
-    - 配置Nginx。注意在jekyll的`_config.yml`中的`baseurl`指定的是自己博客在网站下的子目录。由于github.io的主页就是博客，在github.io里`baseurl = ""`，在VPS上因为还要部署其他应用，因此使用`/blog`作为subpath，即`baseurl="/blog"`。
+    - 配置Nginx。
 
     ```nginx
     location /blog {
         alias /www/wwwroot/www.penistrong.top/blog_site;
     }
+    ```
+    
+    - 由于html中各文件的链接通过`{{ file_path | prepend site.baseurl }}`拼接而成。注意在jekyll的`_config.yml`中的`baseurl`指定的是自己博客在网站下的子目录。由于github.io的主页就是博客，在github.io里`baseurl = ""`，在VPS上因为还要部署其他应用，因此使用`/blog`作为subpath，即`baseurl="/blog"`。
+
+    ```yaml
+    # penistrong.github.io _config.yml
+    baseurl: "" # the subpath of your site, e.g. /blog.On VPS there is "/blog" while "" in penistrong.github.io
+    url: "penistrong.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+
+    # www.penistrong.top _config.yml
+    baseurl: "/blog" # the subpath of your site, e.g. /blog.On VPS there is "/blog" while "" in penistrong.github.io
+    url: "www.penistrong.top" # the base hostname & protocol for your site, e.g. http://example.com 
     ```
 
 - 在VPS上部署成功后，我就写了一篇包含数学推导的博文，使用了$LaTex$语法。但是这个时候就需要引入渲染LaTex的概念。由于是jekyll新手，我只是在官方文档中寻找是否有相关教程。查阅后得知可以通过安装jekyll-spaceship，即一款包含mathjax、emoji渲染器的jekyll plugin，在jekyll开启服务时可以渲染博文中的LaTex语法块为html代码块。当时比较仓促，**忘记查阅GitHub Page是否支持**，只是编写LaTex，运行jekyll服务进行渲染。在VPS上显示很正常。
@@ -82,7 +94,7 @@ tags:
 
 - **问题伊始**：VPS上效果不错，可是penistrong.github.io该怎么办呢，GitHubPages似乎并不能读取GemFile中的相关配置，也就是说在github的个人博客上LaTex仍然无法渲染。于是想利用页内渲染方法，引入支持渲染LaTex的相关js插件完成诉求。
 
-- 页内LaTex的渲染是通过引入[MathJax@v3](http://docs.mathjax.org/en/latest/index.html)实现的，在需要渲染的`博客.md`文件头中设置变量 ` mathjax = true `。通过_layouts/post.html中的 ` {% if page.mathjax %} {% endif %} ` 代码块引入MathJax插件渲染页面。
+- 页内LaTex的渲染是通过引入[MathJax@v3](http://docs.mathjax.org/en/latest/index.html)实现的，在需要渲染的`博客.md`文件头中设置变量 `mathjax = true`。通过_layouts/post.html中的 `{% if page.mathjax %} {% endif %}` 代码块引入MathJax插件渲染页面。
     ```html
     <!-- MathJax v3 in mathjax_support.html -->
     <script>
