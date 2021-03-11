@@ -117,3 +117,5 @@ tags:
     $inlineMath$即行内数学公式，使用常用的单dollar进行包裹。
     $displayMath$即块级数学公式，使用双dollar包裹。
 
+- 但是，在Github Pages中，块级LaTex表达式并没有被正确识别，公式顶格、错位等现象时有发生。在生成的页面中寻找
+
