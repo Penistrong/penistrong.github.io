@@ -119,9 +119,12 @@ tags:
 
 - 但是，在Github Pages中，块级LaTex表达式并没有被正确识别，且`\\`双斜杠换行失效。公式顶格、错位等现象时有发生。在生成的页面中检查MathJax渲染的结果会发现修饰块级表达式的class并没有追加至包裹语句块的dom上
 
+    $$ \begin{bmatrix} 0 & 1 \end{bmatrix}  Example:换行失效 $$
+
     ```html
-    <div class="mathjax">
-    </div>
+    <!-- 修饰块级数学表达式时display="true" -->
+    <mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" display="false" role="presentation" tabindex="0" ctxtmenu_couter="8" style="position:relative">
+    </mjx-container>
     ```
 
     且我在使用LaTex编辑表格后（MovieLens数据集的结构展示）:
@@ -150,6 +153,7 @@ tags:
 - 这下只能转换门庭了！由于我使用VScode的Markdown Preview Enhanced编辑和预览Markdown文件，查阅后发现它使用KaTex。搜索后发现KaTex号称Fast-Rendering，且格式优美支持许多扩展语法。于是转用KaTex。
 
     ```html
+    <!-- KaTeX in katex_support.html -->
     <!-- 有时候mathjax不好使，可以使用KaTex替代 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
 
@@ -178,9 +182,25 @@ tags:
 
 ### 结果
 
-$$ % \f is defined as #1f(#2) using the macro
-   f(x) = \int_{-\infty}^\infty \hat{f} (\xi) e^{2 \pi i \xi x} d\xi
-$$
+$$  \KaTeX : f(x) = \int_{-\infty}^\infty \hat{f} (\xi) e^{2 \pi i \xi x} d\xi $$
 
 终于显示正常了，`\\`换行也能让向量名出现在向量的下方，表格也好看了，人也精神了，**就是头有点秃**。
+
+在jekyll的`_layouts/post.html`中，我使用语句块控制采取哪种LaTex渲染方式。
+
+```liquid
+<!-- add support for mathjax by voleking or KaTex (1 of 2)-->
+{% if page.mathjax %}
+    {% include mathjax_support.html %}
+{% else if page.katex %}
+    {% include katex_support.html %}
+{% endif %}
+```
+
+并在`xxx.md`文件头中如下设置即可
+
+```yaml
+mathjax:    false
+katex:      true
+```
 
