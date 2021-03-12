@@ -117,5 +117,70 @@ tags:
     $inlineMath$即行内数学公式，使用常用的单dollar进行包裹。
     $displayMath$即块级数学公式，使用双dollar包裹。
 
-- 但是，在Github Pages中，块级LaTex表达式并没有被正确识别，公式顶格、错位等现象时有发生。在生成的页面中寻找
+- 但是，在Github Pages中，块级LaTex表达式并没有被正确识别，且`\\`双斜杠换行失效。公式顶格、错位等现象时有发生。在生成的页面中检查MathJax渲染的结果会发现修饰块级表达式的class并没有追加至包裹语句块的dom上
+
+    ```html
+    <div class="mathjax">
+    </div>
+    ```
+
+    且我在使用LaTex编辑表格后（MovieLens数据集的结构展示）:
+
+    ```LaTex
+    \begin{array}{c|c|c} \hline
+    \text{movieId} & \text{title} & \text{genres} \\ \hline
+    1 & \text{Toy Story(1995)} & Adventure|Animation|Children|Comedy|Fantasy \\
+    2 & \text{Heat (1995)} & Action|Crime|Thriller \\
+    3 & \text{Casino (1995)} & Crime|Drama \\
+    \cdots & \cdots &\cdots \\ \hline
+    \end{array}
+    ```
+    本应渲染成如下表格形式，第一行的\hline即表格的顶线
+    
+    $$ \begin{array}{c|c|c} \hline
+        \text{movieId} & \text{title} & \text{genres} \\ \hline
+        1 & \text{Toy Story(1995)} & Adventure|Animation|Children|Comedy|Fantasy \\
+        2 & \text{Heat (1995)} & Action|Crime|Thriller \\
+        3 & \text{Casino (1995)} & Crime|Drama \\
+        \cdots & \cdots &\cdots \\ \hline
+    \end{array} $$
+
+    但MathJax无法识别其中第一行的\hline，总是报错说\hline的位置有误。不光如此，使用jekyll-spaceship的服务器端博客也出现相同问题。对比了二者的渲染结果后，其实jekyll-spaceship也不过是在页面`<head></head>`中插入了MathJax@v3的js链接，二者本质是一样的，即**MathJax无法识别一些特定语法**。
+
+- 这下只能转换门庭了！由于我使用VScode的Markdown Preview Enhanced编辑和预览Markdown文件，查阅后发现它使用KaTex。搜索后发现KaTex号称Fast-Rendering，且格式优美支持许多扩展语法。于是转用KaTex。
+
+    ```html
+    <!-- 有时候mathjax不好使，可以使用KaTex替代 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css" integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X" crossorigin="anonymous">
+
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js" integrity="sha384-g7c+Jr9ZivxKLnZTDUhnkOnsh30B4H0rpLUpJ4jAIKs4fnJI+sEnkvrMWph2EDg4" crossorigin="anonymous"></script>
+
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" integrity="sha384-mll67QQFJfxn0IYznZYonOWZ644AWYC+Pt2cHqMaRhXVrursRwvLnLaebdGIlYNa" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$", right: "$", display: false},
+                    {left: "$$", right: "$$", display: true},
+                    {left: "\\(", right: "\\)", display: false},
+                    {left: "\\[", right: "\\]", display: true}
+                ]
+            });
+        });
+    </script>
+    ```
+
+    `delimiters`中可以设置界定数学表达式块的分界符，其中`display=false`表示行内表达式，反之同理。
+
+### 结果
+
+$$ % \f is defined as #1f(#2) using the macro
+   f(x) = \int_{-\infty}^\infty \hat{f} (\xi) e^{2 \pi i \xi x} d\xi
+$$
+
+终于显示正常了，`\\`换行也能让向量名出现在向量的下方，表格也好看了，人也精神了，**就是头有点秃**。
 
