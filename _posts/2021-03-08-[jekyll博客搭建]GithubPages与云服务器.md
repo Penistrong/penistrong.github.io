@@ -32,7 +32,7 @@ tags:
     jekyll serve --watch
     ```
 
-- 过了一段时间，由于GFW的封锁，我不得不将搭载v2ray服务端的VPS使用TLS+WebSocket+Nginx进行改造，伪装网站流量。在一系列注册域名、设置dns解析、配置Nginx等等操作后，我突然萌生了一个想法：为什么不将VPS作为服务器部署自己的个人博客呢？而且这很容易做到，只需要在服务器端安装Ruby和jekyll，在服务端运行即可。于是我在VPS上git-clone了自己的penistrong.github.io.git仓库，安装依赖并配置Nginx后成功运行。
+- 过了一段时间，由于GFW的封锁，我不得不将搭载v2ray服务端的[VPS使用TLS+WebSocket+Nginx进行改造]({% post_url /jekyll/update/2019-09-30-科学学习英语 %})，伪装网站流量。在一系列注册域名、设置dns解析、配置Nginx等等操作后，我突然萌生了一个想法：为什么不将VPS作为服务器部署自己的个人博客呢？而且这很容易做到，只需要在服务器端安装Ruby和jekyll，在服务端运行即可。于是我在VPS上git-clone了自己的penistrong.github.io.git仓库，安装依赖并配置Nginx后成功运行。
     - 使用`jekyll build`。将静态网站生成至服务器的域名网站目录下，使用增量更新，力求快速。
 
     ```shell
@@ -186,15 +186,19 @@ $$  \KaTeX : f(x) = \int_{-\infty}^\infty \hat{f} (\xi) e^{2 \pi i \xi x} d\xi $
 
 终于显示正常了，`\\`换行也能让向量名出现在向量的下方，表格也好看了，人也精神了，**就是头有点秃**。
 
-在jekyll的`_layouts/post.html`中，我使用语句块控制采取哪种LaTex渲染方式。
+###注意事项
 
+如果确定使用KaTex的话，记得关闭jekyll-spaceship的MathJax-processor，或者直接卸载。
+在jekyll的`_layouts/post.html`中，我使用Liquid语句块控制采取哪种LaTex渲染方式。
+
+{% assign openTag = '{%' %}
 ```liquid
 <!-- add support for mathjax by voleking or KaTex (1 of 2)-->
-{% if page.mathjax %}
-    {% include mathjax_support.html %}
-{% else if page.katex %}
-    {% include katex_support.html %}
-{% endif %}
+{{openTag}} if page.mathjax %}
+    {{openTag}} include mathjax_support.html %}
+{{openTag}} else if page.katex %}
+    {{openTag}} include katex_support.html %}
+{{openTag}} endif %}
 ```
 
 并在`xxx.md`文件头中如下设置即可
