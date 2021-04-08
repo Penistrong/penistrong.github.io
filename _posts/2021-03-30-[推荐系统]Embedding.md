@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "[推荐系统]Embedding"
-subtitle:   "Subtitle here"
+subtitle:   "Embedding相关知识及应用"
 author:     Penistrong
 date:       2021-03-30 19:25:23 +0800
 categories: jekyll update
@@ -120,16 +120,10 @@ NLP领域的Word2vec处理的是句子中的词“序列”，如果将用户观
 DeepWalk于2014年由美国石溪大学研究者提出,主要思想是在由物品组成的图结构上进行随机游走，产生大量物品序列，并将这些序列作为训练样本最终便可得到物品的Embedding。DeepWalk可看作过渡序列Embedding和Graph Embedding的一种过渡方法。
 
 $$ \begin{aligned}
-    U_1 :&   &   & D & A & B      \\
-    U_2 :& B & E &   & D & E & F  \\
-    U_3 :& E & C & B &   & B & A
+    U_1 :& \#  & \#  & D & A & B & \#     \\
+    U_2 :& B & E & \# & D & E & F  \\
+    U_3 :& E & C & B & \# & B & A
 \end{aligned} $$
-
-```mermaid
-graph LR
-    D((D)) --> A((A)) --> B((B))
-    
-```
 
 对于原始用户行为序列，比如购买物品序列、观看视频序列，用这些Item构建物品关系图。比如用户$U_i$先后购买了物品A和B，就在图中增加一条由A到B的有向边，如果后续产生了多条相同有向边，则表征为加强该有向边的权重。如此这般扫描所有用户行为序列后，全局物品关系图就这样建立了起来。
 
@@ -141,12 +135,12 @@ graph LR
 
 $$
     P(v_j \mid v_i) = \begin{cases}
-                        \frac{M_{ij}}{\sum_{v_k \in N_+(V_i)} M_{ik}}, & v_j \in N_+(v_i) \\
+                        \frac{\omega_{ij}}{\sum_{v_k \in N_+(V_i)} \omega_{ik}}, & v_j \in N_+(v_i) \\
                         0, & e_{ij} \notin \varepsilon
                       \end{cases}
 $$
 
-其中，$N_+(v_i)$为节点$v_i$所有出边的集合，$M_{ij}$即节点$v_i$到$v_j$的权重。DeepWalk的跳转概率就是跳转边权重占源点所有出边权重之和的比例。当物品关系图为无向无权图时，权重$M_{ij}$固定为1，且$N_+(v_i)$退化为$N(v_i)$。
+其中，$N_+(v_i)$为节点$v_i$所有出边的集合，$\omega_{ij}$即节点$v_i$到$v_j$的权重。DeepWalk的跳转概率就是跳转边权重占源点所有出边权重之和的比例。当物品关系图为无向无权图时，权重$\omega_{ij}$固定为1，且$N_+(v_i)$退化为$N(v_i)$。
 
 #### Node2vec:基于同质性与结构性权衡
 
