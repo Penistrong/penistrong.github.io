@@ -11,7 +11,7 @@ katex:      true
 tags:
     - 毕业设计
     - RecSys
-    - DeepLearning
+    - Deep Learning
 ---
 
 # 推荐系统
