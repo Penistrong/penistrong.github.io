@@ -193,3 +193,314 @@ Node2vec通过控制节点间跳转概率以实现倾向性控制
     在推荐系统中可以应用Node2vec在同质性和结构性倾向上的不同Embedding结果，发掘物品关系图中的不同特征，以输入深度学习网络。
 
 ## 应用Embedding
+
+对于电影推荐系统而言，Item序列即电影的序列。
+
+通常电影平台是通过用户的观影序列，为其生成推荐列表。而MovieLens数据集并不包含用户的观影序列，它只记录了用户对电影进行评分的行为，并存放于`ratings.csv`中。即现在我要做的是将用户的评分行为生成Embedding，并根据当前电影的Embedding与其他电影的Embedding向量计算相似度，生成相关电影列表。
+
+这里以用户评价过的电影为例，每个用户给电影打分，分值分布在$[0, 5]$之间，而用户给电影评价是有时间顺序的，即一个用户评价过的电影形成了一个序列。
+
+### 数据集ratings.csv格式
+
+$$ \begin{array}{|c|c|c|c|} \hline
+    \text{userId} & \text{movieId} & \text{rating} & \text{timestamp} \\ \hline
+    1 & 2  & 3.5 & 1112486027 \\ \hline
+    1 & 29 & 3.5 & 1112484676 \\ \hline
+    2 & 3  & 4.0 & 974820889  \\ \hline
+    \cdots & \cdots & \cdots & \cdots  \\ \hline
+\end{array} $$
+
+### 使用pyspark处理ratings.csv
+
+#### Item2vec的基础方法
+
+注意，这里使用了pyspark.sql过滤掉每个用户其评分较低的电影，再将其评分过的电影按照评分时间戳排序。
+过滤评分较低的电影原因是为了让Item2vec模型学习到评分较高电影间的相似性，则此时先排除评分较低的电影（生成推荐列表时其实最好也是推荐评分较高的其他电影）。
+
+```python
+def sortF(movie_list, timestamp_list):
+    """
+    Sort by timestamp then return the corresponding movie sequence
+    :param movie_list: [1,2,3]
+    :param timestamp_list: [123456,12345,10000]
+    :return: [3,2,1]
+    """
+    # 存放(movie, timestamp)形式的tuple列表
+    pairs = []
+    for m, t in zip(movie_list, timestamp_list):
+        pairs.append((m, t))
+    # 根据timestamp排序，使用sorted()，排序键选择tuple中的第二个元素，即x[1]
+    # 默认ASC升序排序，也可以追加参数reverse=true以降序排序
+    pairs = sorted(pairs, key=lambda x: x[1])
+    # 根据时间排序后，只返回电影id的序列
+    return [x[0] for x in pairs]
+
+
+# 根据Item2vec的思想，将电影评价转换为Item Sequence，尔后交给Word2vec模型进行训练
+# Item2vec要学习到物品之间的相似性，根据应用上下文，这里仅过滤评分较高的电影，以学习他们的相似性
+def processItemSequence(spark, rawSampleDataPath):
+    # rating data from rawSampleDataPath
+    ratingSamples = spark.read.format("csv").option("header", "true").load(rawSampleDataPath)
+    # ratingSamples.show(5)
+    # ratingSamples.printSchema()
+    # udf:User defined function，实现一个用户定义的操作函数，用于之后Spark处理数据集时排序元数据使用
+    sortUdf = udf(sortF, ArrayType(StringType()))
+    # pyspark.sql，类sql写法
+    # 按照用户id分组，过滤掉3.5/5分以下的电影，并在聚集函数中使用UDF对同一用户组的电影评价按时间进行排序(聚集函数默认会在DataFrame中新增一列)
+    # 返回的是排序好的movieIds(顺序存放movieId的列表，在DataFrame中新增一列，名为movieIds)
+    # 最后使用withColumn新增一列，列名为movieIdStr，其内容为取movieIds列中列表的各id分量以空格为分界符连接为一个String
+    userSeq = ratingSamples \
+        .where(F.col("rating") >= 3.5) \
+        .groupBy("userId") \
+        .agg(sortUdf(F.collect_list("movieId"), F.collect_list("timestamp")).alias('movieIds')) \
+        .withColumn("movieIdStr", array_join(F.col("movieIds"), " "))
+
+    userSeq.show()
+    # rdd is Resilient Distributed Dataset
+    return userSeq.select("movieIdStr").rdd.map(lambda x: x[0].split(' '))
+```
+
+```shell
+# 生成的Item序列(User Rated Movie Sequence)
+# 最后只用到了第三列"movieIdStr"的内容
++------+--------------------+--------------------+
+|userId|            movieIds|          movieIdStr|
++------+--------------------+--------------------+
+| 10096| [858, 50, 593, 457]|      858 50 593 457|
+| 10351|[1, 25, 32, 6, 60...|1 25 32 6 608 52 ...|
+| 10436|[661, 107, 60, 1,...|661 107 60 1 919 ...|
+|  1090|[356, 597, 919, 986]|     356 597 919 986|
+| 11078|[232, 20, 296, 59...|232 20 296 593 45...|
+| 11332|           [589, 32]|              589 32|
+| 11563|[382, 147, 782, 7...|382 147 782 73 85...|
+|  1159|[111, 965, 50, 15...|111 965 50 154 22...|
+| 11722|[161, 480, 589, 3...|161 480 589 364 1...|
+| 11888|[296, 380, 344, 5...|296 380 344 588 5...|
+| 12529|[902, 318, 858, 3...|902 318 858 356 5...|
+| 12847|[296, 590, 588, 3...|296 590 588 318 5...|
+| 13192|[527, 858, 750, 2...|527 858 750 293 2...|
+| 13282|[596, 661, 783, 9...|596 661 783 903 9...|
+| 13442|[593, 778, 296, 288]|     593 778 296 288|
+| 13610|[541, 32, 589, 26...|541 32 589 260 29...|
+| 13772|[318, 527, 296, 1...|318 527 296 17 59...|
+| 13865|[380, 165, 457, 2...|380 165 457 292 3...|
+| 14157|[858, 593, 260, 2...|858 593 260 296 1...|
+| 14204|[296, 349, 316, 3...|296 349 316 318 3...|
++------+--------------------+--------------------+
+only showing top 20 rows
+```
+
+得到Item Sequence后，下一步就是将其作为训练样本送入Word2vec模型进行训练，目标是得到各电影的Embedding向量。
+使用`pyspark.mllib.feature`里的Word2vec模型
+
+```python
+from pyspark.mllib.feature import Word2Vec
+
+# 使用Word2vec模型训练得到Item2vec的Embedding向量
+def trainItem2vec(spark, samples, embLength, embOutputPath, redisKeyPrefix, saveToRedis=False):
+    # 构造Word2vec网络模型结构
+    # setVectorSize设置Embedding向量的维度，即Word2vec的隐含层的神经元数目
+    # setWindowSize设置在序列上进行滑动的滑动窗口大小(windowSize=2c+1)
+    # setNumIterations设置训练模型时的迭代次数，类似epoch
+    word2vec = Word2Vec().setVectorSize(embLength).setWindowSize(5).setNumIterations(10)
+    model = word2vec.fit(samples)
+    # 调用封装好的函数寻找与某个item最相似的N个其它item
+    # 这里是用余弦相似度计算的相似性，其它相似性计算方法见我的另一篇博文
+    synonyms = model.findSynonyms("592", 20)  # id"592"为蝙蝠侠Batman
+    for synonym, cosineSimilarity in synonyms:
+        print(synonym, cosineSimilarity)
+    # 准备从训练完毕后的Word2vec中取出Embedding向量并存入目标文件夹中或redis中
+    embOutputDir = '/'.join(embOutputPath.split('/')[:-1])  #
+    if not os.path.exists(embOutputDir):
+        os.mkdir(embOutputDir)
+    # 使用getVectors()方法得到存放word及其向量表达(Embedding向量,W_vxn的行向量)的map<movie_id : String, Embedding : Vector>
+    with open(embOutputPath, 'w') as file:
+        for movie_id in model.getVectors():
+            vectors = " ".join([str(emb) for emb in model.getVectors()[movie_id]])
+            file.write(movie_id + ":" + vectors + "\n")
+    # TODO: embeddingLSH(spark, model.getVectors())
+    return model
+```
+
+与ID为"592"的电影《Batman》最为相似的前20部电影，以余弦相似度降序排序
+```csv
+380 0.9233925938606262
+150 0.893817663192749
+590 0.8740843534469604
+165 0.8195751905441284
+153 0.8143924474716187
+349 0.8027638792991638
+588 0.788188099861145
+457 0.7476001381874084
+344 0.714634358882904
+480 0.7013552188873291
+316 0.6817461252212524
+595 0.6664051413536072
+296 0.6509096026420593
+589 0.6373887658119202
+329 0.61918044090271
+318 0.611433744430542
+356 0.5735329389572144
+1 0.537996768951416
+110 0.5199078917503357
+593 0.5167772769927979
+```
+
+当然，这里只是使用spark自带的函数显示相似电影的一个demo。在推荐系统的实现中（比如我的毕业设计：Cinema Chain Platform），需要从数据库取出Embedding向量后，自行计算与其他电影Embedding向量的余弦相似度并生成推荐列表。
+
+#### Graph Embedding
+
+使用Deep Walk进行简单实现
+
+在Deep Walk的概念中，最重要的是求出从某节点跳转到其各个邻接节点的概率，则要求出转移概率矩阵
+
+```python
+'''
+Graph Embedding
+使用Deep Walk的简单实现
+依据Deep Walk原理，要准备Item之间的概率转移矩阵，即图中到达某节点后，根据其出边权重和计算的跳转到各邻接节点的概率
+'''
+
+
+# 根据输入的Item序列，将其中元素两两结合生成相邻的Item Pair
+def generate_pair(x):
+    # eg
+    # input x as Seq: [50, 120, 100, 240] List[str]
+    # output pairSeq: [(50, 120), (120, 100), (100, 240)] List[Tuple(str, str)]
+    pairSeq = []
+    previous_item = ''
+    for item in x:
+        if not previous_item:
+            previous_item = item
+        else:
+            pairSeq.append((previous_item, item))
+            previous_item = item
+    return pairSeq
+
+
+"""
+生成转移概率矩阵
+return transitionMatrix(转移概率矩阵) as defaultdict(dict), itemDistribution
+"""
+
+# samples即上一步生成的Item Sequence而不是电影各自的Embedding
+def generateTransitionMatrix(samples):
+    # 使用flatMap将Item序列碎为一个个Item Pair
+    pairSamples = samples.flatMap(lambda x: generate_pair(x))
+    # 使用pyspark.rdd.countByValue(), 返回的是存放Item Pair及其出现的次数的dictionary, 即{(v1, v2):2, (v1, v3):4, ...}
+    # Return the count of each unique value in this RDD as a dictionary of (value, count) pairs.
+    pairCountMap = pairSamples.countByValue()
+    # 记录总对数
+    pairTotalCount = 0
+    # 转移数量矩阵,双层Map类数据结构.Like Map<String, Map<String, Integer>> in JAVA
+    transitionCountMatrix = defaultdict(dict)
+    # 记录从某节点出发，其所有出边的权重之和
+    itemCountMap = defaultdict(int)
+    # 统计Item Pair的个数 {tuple(v1, v2):int(count)}
+    for pair, count in pairCountMap.items():
+        v1, v2 = pair
+        transitionCountMatrix[v1][v2] = count
+        itemCountMap[v1] += count
+        pairTotalCount += count
+    # 转移概率矩阵，根据前述辅助变量进行计算
+    transitionMatrix = defaultdict(dict)
+    itemDistribution = defaultdict(dict)
+    for v1, transitionMap in transitionCountMatrix.items():
+        for v2, count in transitionMap.items():
+            # 从某节点跳转到其某一邻接节点的概率是该边权重占所有出边权重之和的比例
+            transitionMatrix[v1][v2] = transitionCountMatrix[v1][v2] / itemCountMap[v1]
+    for v, count in itemCountMap.items():
+        itemDistribution[v] = count / pairTotalCount
+    return transitionMatrix, itemDistribution
+```
+
+生成完毕转移概率矩阵后，其实也隐含了Item Graph的图结构，即一个用邻接矩阵描述的Graph，只是不邻接的节点之间在矩阵之中不存在其边对应的0值。下一步就是在这个图中进行随机游走，生成训练样本。
+
+```python
+# 单次随机游走
+def oneRandomWalk(transitionMatrix, itemDistribution, sampleLength):
+    sample = []
+    # 随机选择本次游走的起点
+    # 产生一个[0,1)间的随机浮点数
+    randomDouble = random.random()
+    startItem = ""
+    accumulateProbability = 0.0
+    # 朴素方法找起始节点
+    for item, prob in itemDistribution.items():
+        accumulateProbability += prob
+        if accumulateProbability >= randomDouble:
+            startItem = item
+            break
+    sample.append(startItem)
+    # 标记当前节点的变量
+    cur_v = startItem
+    i = 1
+    while i < sampleLength:
+        # 如果当前节点没有出边，即本次游走终止(即本次训练样本长度小于最大样本长度)
+        if (cur_v not in itemDistribution) or (cur_v not in transitionMatrix):
+            break
+        next_v_probability = transitionMatrix[cur_v]
+        # 故技重施
+        randomDouble = random.random()
+        accumulateProbability = 0.0
+        for next_v, probability in next_v_probability.items():
+            accumulateProbability += probability
+            if accumulateProbability >= randomDouble:
+                cur_v = next_v
+                break
+        sample.append(cur_v)
+        i += 1
+    return sample
+
+
+# 在图中随机游走生成训练样本
+def randomWalk(transitionMatrix, itemDistribution, sampleCount, sampleLength):
+    samples = []
+    for i in range(sampleCount):
+        samples.append(oneRandomWalk(transitionMatrix, itemDistribution, sampleLength))
+    return samples
+```
+
+仍是将得到的训练样本输入Item2vec进行训练
+
+```python
+def graphEmbedding(samples, spark, embLength, embOutputPath, redisKeyPrefix, saveToRedis=False):
+    # 根据samples(Item Sequence)生成图及其概率转移矩阵和Item的分布情况(某Item作为源点出现在所有节点对中的次数占)
+    transitionMatrix, itemDistribution = generateTransitionMatrix(samples)
+    # 先定死样本数量(即游走次数)和每个训练样本的最大长度(生成的训练样本有可能提前终止)
+    sampleCount = 20000
+    sampleLength = 10
+    rawSamples = randomWalk(transitionMatrix, itemDistribution, sampleCount, sampleLength)
+    # 使用sc.parallelize分发训练样本集形成一个RDD(即创建并行集合)
+    rddSamples = spark.sparkContext.parallelize(rawSamples)
+    # 开始训练
+    trainItem2vec(spark, rddSamples, embLength, embOutputPath, redisKeyPrefix=redisKeyPrefix, saveToRedis=saveToRedis)
+```
+
+使用Graph Embedding后，训练Item2vec后仍显示与电影Batman相似的前20部电影，可以与前述Item2ve基础方法的样例进行比较
+
+```csv
+380 0.9517624974250793
+590 0.9420034289360046
+150 0.9202093482017517
+349 0.8714569211006165
+165 0.8661364316940308
+153 0.8209306001663208
+780 0.7379775047302246
+588 0.7256513833999634
+457 0.7177420854568481
+296 0.7155550122261047
+1 0.7154592275619507
+316 0.6954978704452515
+344 0.6731524467468262
+589 0.6293243765830994
+480 0.6050290465354919
+595 0.5840312242507935
+260 0.5788465738296509
+356 0.5788094401359558
+318 0.5676533579826355
+648 0.5578194856643677
+```
+
+在推荐系统中的蝙蝠侠电影详情页里，我手动标出了各电影在数据集中的movieId，对比上述结果可以直观看到推荐电影与蝙蝠侠的相似度还是比较可靠的
+![与蝙蝠侠相似的电影推荐列表](https://i.bmp.ovh/imgs/2021/04/4fa20d6508624bd5.png)
