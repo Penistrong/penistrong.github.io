@@ -15,7 +15,9 @@ tags:
 ---
 
 # 推荐系统
+
 ## Embedding
+
 Embedding是用一个数值向量表示一个对象的方法，这个对象可以是一个词、一个物品也可以是一部电影。之所以能用向量表示物品，是因为这个向量与其他物品向量之间的距离可以反映这些物品的相似性，即两个向量间的距离向量可以反映他们之间的关系。
 
 Google的著名论文Word2vec中提出了Embedding的经典方法，利用Word2vec模型将单词映射到高维空间中。词向量之间的运算可以揭示词之间的关系，比如:
@@ -27,10 +29,13 @@ $$ Embedding(Woman) = Embedding(Man) + [Embedding(Queen) - Embedding(King)] $$
 那么推荐系统中何以用到Embedding技术呢？既然Embedding技术可以揭示向量之间的关系，那么在电影推荐系统中，如果将电影和用户映射到Embedding空间后，就可以通过找出某一用户周围的电影向量，将这些电影推荐给用户即可。
 
 ### Embedding技术在特征工程中的重要性
+
 #### 处理稀疏特征
+
 在传统特征工程中，因为推荐场景下的类别、ID类特征尤其多，大量使用One-hot编码会导致样本特征向量极度稀疏，而深度学习的结构特点又不利于稀疏特征向量的处理，因此较为成熟的深度学习推荐模型都会使用Embedding层将稀疏高维特征向量转换为稠密低维特征向量。
 
 #### 融合基本特征
+
 从上述对Embedding的介绍中可以发现，相比由原始信息直接处理得到的特征向量，Embedding的表达能力更强。Embedding几乎可以引入任何信息进行编码，使其本身融合大量的信息，即Embedding技术是一种可以通过融合大量基本特征从而生成高阶特征向量的有效手段。
 
 ### Word2vec
@@ -59,7 +64,7 @@ Word2vec最初应用于NLP领域，训练样本来自于语料库。
 例子：
 
 $$  
-    \color{red}Embedding \color{black}| \color{red}技术 \color{black}|在| \color{red}深度学习 \color{black}| \color{red}推荐系统 \color{black}|中|的|\color{red}可用性 \\ 
+    \color{red}Embedding \color{black}| \color{red}技术 \color{black}|在| \color{red}深度学习 \color{black}| \color{red}推荐系统 \color{black}|中|的|\color{red}可用性 \\
     \color{black}去除介词和分词 \\
     选取大小为3的滑动窗口在该句子上滑动，生成适用于Skip-gram模型的训练样本 \\
     \begin{alignedat}{2}
@@ -91,7 +96,7 @@ $$ p(w_O \mid w_I) = \frac{exp(v'_{w_O}v_{w_I})}{\sum_{i=1}^{V}exp(v_{w_i}^{'\to
 
 上一节中描述了Word2vec的神经网络，那么如何提取每个词对应的Embedding向量呢？前面提到的维度为N的隐含层，这个N其实就是Embedding向量的维度
 
-![](https://static001.geekbang.org/resource/image/0d/72/0de188f4b564de8076cf13ba6ff87872.jpeg)
+![Embedding向量](https://static001.geekbang.org/resource/image/0d/72/0de188f4b564de8076cf13ba6ff87872.jpeg)
 
 上图中的Embedding Matrix即输入向量矩阵$W_{V \times N}$，该矩阵的每一个行向量就是目标词向量。比如语料库词典中第i个词对应的Embedding，其输入向量由于采用One-hot编码，该输入向量的第i维就应该是1，则$W_{V \times N}$中第i行的行向量就是第i个词对应的Embedding。
 
@@ -166,7 +171,6 @@ Node2vec通过控制节点间跳转概率以实现倾向性控制
 
     $$ \pi_{vx} = \alpha_{pq}(t,x) \cdot \omega_{vx}  $$
 
-
 - 上式中，$\alpha_{pq}(t,x)$是Node2vec定义的一个跳转权重，为了倾向同质性或结构性就要分别倾向于BFS或DFS，这个倾向性与该跳转权重有关:
 
     $$ \alpha_{pq}(t,x) = \begin{cases}
@@ -180,9 +184,9 @@ Node2vec通过控制节点间跳转概率以实现倾向性控制
 
     另外，式中的参数$p$和$q$共同控制随机游走的倾向性：
 
-    - $p$为返回参数(Return Parameter):$p$越小,则$\frac{1}{p}$越大，即下一步跳转回到节点$t$的概率更大，此时游走过程就更倾向于BFS，仿佛是在遍历节点$t$的所有邻接节点，**注重结构性**。
+  - $p$为返回参数(Return Parameter):$p$越小,则$\frac{1}{p}$越大，即下一步跳转回到节点$t$的概率更大，此时游走过程就更倾向于BFS，仿佛是在遍历节点$t$的所有邻接节点，**注重结构性**。
 
-    - $q$为进出参数(In-Out Parameter):$q$越小，则$\frac{1}{q}$越大，即下一步跳转到远方节点的概率更大，此时倾向于DFS，**注重同质性**。
+  - $q$为进出参数(In-Out Parameter):$q$越小，则$\frac{1}{q}$越大，即下一步跳转到远方节点的概率更大，此时倾向于DFS，**注重同质性**。
 
     通过调整参数$p$和$q$，就可以产生不同的Embedding结果。
 
@@ -323,6 +327,7 @@ def trainItem2vec(spark, samples, embLength, embOutputPath, redisKeyPrefix, save
 ```
 
 与ID为"592"的电影《Batman》最为相似的前20部电影，以余弦相似度降序排序
+
 ```csv
 380 0.9233925938606262
 150 0.893817663192749
