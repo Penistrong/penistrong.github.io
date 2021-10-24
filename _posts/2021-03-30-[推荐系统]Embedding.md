@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "[推荐系统]Embedding"
+title:      "[推荐系统] Embedding"
 subtitle:   "Embedding相关知识及应用"
 author:     Penistrong
 date:       2021-03-30 19:25:23 +0800

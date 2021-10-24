@@ -1,4 +1,4 @@
-﻿---
+---
 layout:     post
 title:      "[Data Structure]二叉树的概念及其扩展"
 subtitle:   "「数据结构」基础二叉树"
