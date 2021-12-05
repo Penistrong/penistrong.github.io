@@ -141,7 +141,7 @@ $$
 
 **3D体绘制**: 前人的研究工作[^47][^57][^61][^77]利用体绘制输出了一个RGB值，我们将此公式扩展以渲染一个 $M_f$-维特征向量 $\mathbf{f}$。
 
-对于给定的相机外部参数 $\xi$，令 $\lbrace \mathbf{x}_{j} \rbrace_{j=1}^{N_s}$ 为给定像素点沿相机射出光线 $\mathbf{d}$ 的各个不同采样点($N_s$为采样点个数)，并且令 $(\sigma_{j}, \mathbf{f}_j) = C(\mathbf{x}_j, \mathbf{d})$ 为采样点 $\mathbf{x}_j$ 的特征场对应的体积密度和特征向量。体绘制算子 $\pi_{\textrm{vol}}$ 将这些采样点的评估映射到该像素点的最终特征向量 $\mathbf{f}$:
+对于给定的相机外部参数$\xi$，令$\lbrace \mathbf{x}_{j} \rbrace_{j=1}^{N_s}$为给定像素点沿相机射出光线$\mathbf{d}$的各个不同采样点($N_s$为采样点个数)，并且令$(\sigma_{j}, \mathbf{f}_j) = C(\mathbf{x}_j, \mathbf{d})$为采样点$\mathbf{x}_j$的特征场对应的体积密度和特征向量。体绘制算子$\pi_{\textrm{vol}}$将这些采样点的评估映射到该像素点的最终特征向量$\mathbf{f}$:
 
 $$
 \begin{array}{c}
