@@ -50,6 +50,7 @@ tags:
 ### 3.1 使用神经特征场表示对象
 
 **神经辐射场**: 辐射场是一个将3D点 $\mathbf{x} \in \mathbb{R}^3$ 和视角方向 $\mathbf{d} \in \mathbb{S}^2$ 映射到体积密度$\sigma \in \mathbb{R}^{+}$和RGB颜色值 $\mathbf{c} \in \mathbb{R}^3$ 的连续函数 $f$ 。其他两篇论文[^61][^82]观察到，当 $f$ 用神经网络参数化时，低维输入 $\mathbf{x}$ 和 $\mathbf{d}$ 需要被映射到高维特征才能够表示复杂信号。更具体地说，需要使用一个预定义的位置编码逐元素地应用到 $\mathbf{x}$ 和 $\mathbf{d}$ 的每个分量上:
+
 $$
 \gamma(t, L) = \left( \sin(2^{0}t\pi), \cos(2^{0}t\pi), \dots, \sin(2^{L}t\pi), \cos(2^{L}t\pi) \right) \tag{1}
 $$
@@ -69,6 +70,7 @@ $$
 其中 $\theta$ 表示网络的参数，$L_{\mathrm{x}},L_{\mathrm{d}}$ 表示位置编码的输出维度。
 
 **生成式神经特征场**: 上述两篇论文中其中一篇[^61]是将 $\theta$ 拟合到单个场景的多姿态图像上，但是Schwarz等人[^77]提出了一个适用于神经辐射场的生成模型(GRAF)，该模型可以在未定位姿态的图像集上进行训练。为了学习NeRFs的隐空间，他们根据形状和外观的隐向量 $\mathrm{z}_s, \mathrm{z}_a \sim \mathcal{N}(0, I)$来调节MLP:
+
 $$
 \begin{aligned}
 g_{\theta} : \mathbb{R}^{L_{\mathbf{x}}} \times \mathbb{R}^{L_{\mathbf{d}}} \times \mathbb{R}^{M_s} \times \mathbb{R}^{M_a} &\to \mathbb{R}^{+} \times \mathbb{R}^{3} \\
@@ -139,7 +141,7 @@ $$
 
 **3D体绘制**: 前人的研究工作[^47][^57][^61][^77]利用体绘制输出了一个RGB值，我们将此公式扩展以渲染一个 $M_f$-维特征向量 $\mathbf{f}$。
 
-对于给定的相机外部参数 $\xi$ ，令 $\{\mathbf{x}_j\}_{j=1}^{N_s}$ 为给定像素点沿相机射出光线 $\mathbf{d}$ 的各个不同采样点($N_s$为采样点个数)，并且令 $(\sigma_j, \mathbf{f}_j) = C(\mathbf{x}_j, \mathbf{d})$ 为采样点 $\mathbf{x}_j$ 的特征场对应的体积密度和特征向量。体绘制算子 $\pi_{\textrm{vol}}$ 将这些采样点的评估映射到该像素点的最终特征向量 $\mathbf{f}$:
+对于给定的相机外部参数 $\xi$，令 $\{\mathbf{x}_{j}\}_{j=1}^{N_s}$ 为给定像素点沿相机射出光线 $\mathbf{d}$ 的各个不同采样点($N_s$为采样点个数)，并且令 $(\sigma_{j}, \mathbf{f}_j) = C(\mathbf{x}_j, \mathbf{d})$ 为采样点 $\mathbf{x}_j$ 的特征场对应的体积密度和特征向量。体绘制算子 $\pi_{\textrm{vol}}$ 将这些采样点的评估映射到该像素点的最终特征向量 $\mathbf{f}$:
 
 $$
 \begin{array}{c}
