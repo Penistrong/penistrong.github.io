@@ -6,8 +6,8 @@ author:     Penistrong
 date:       2021-12-05 13:30:13 +0800
 categories: jekyll update
 catalog:    true
-mathjax:    false
-katex:      true
+mathjax:    true
+katex:      false
 tags:
     - GAN
     - CVPR
@@ -141,7 +141,7 @@ $$
 
 **3D体绘制**: 前人的研究工作[^47][^57][^61][^77]利用体绘制输出了一个RGB值，我们将此公式扩展以渲染一个 $M_f$-维特征向量 $\mathbf{f}$。
 
-对于给定的相机外部参数 ${\xi}$，令 $\{ \mathbf{x}_{j} \}_{j=1}^{N_s}$ 为给定像素点沿相机射出光线 $\mathbf{d}$ 的各个不同采样点($N_s$为采样点个数)，并且令 $(\sigma_{j}, \mathbf{f}_j)=C(\mathbf{x}_j, \mathbf{d})$ 为采样点 $\mathbf{x}_j$ 的特征场对应的体积密度和特征向量。体绘制算子 $\pi_{\textrm{vol}}$ 将这些采样点的评估映射到该像素点的最终特征向量 $\mathbf{f}$:
+对于给定的相机外部参数 ${\xi}$，令 $\{\mathbf{x}_{j}\}_{j=1}^{N_s}$ 为给定像素点沿相机射出光线 $\mathbf{d}$ 的各个不同采样点($N_s$为采样点个数)，并且令 $(\sigma_{j}, \mathbf{f}_j)=C(\mathbf{x}_j, \mathbf{d})$ 为采样点 $\mathbf{x}_j$ 的特征场对应的体积密度和特征向量。体绘制算子 $\pi_{\textrm{vol}}$ 将这些采样点的评估映射到该像素点的最终特征向量 $\mathbf{f}$:
 
 $$
 \begin{array}{c}
@@ -159,7 +159,7 @@ $$
 \alpha_{j} = 1 - e^{-\sigma_j\delta_j} \tag{10}
 $$
 
-其中 $\tau_j$ 是透射率，$\alpha_j$ 是 $\mathbf{x}_j$ 的alpha值，$\delta_j = ||\mathbf{x}_{j+1} - \mathbf{x}_j ||_2$ 是相邻样本点之间的距离。于每个像素点上计算 $\pi_{\textrm{vol}}$ 即可得到整个特征图像。为了提高效率，我们以 $16^2$ 的分辨率渲染特征图像，该分辨率低于 $64^2$ 或 $256^2$ 像素点的输出分辨率。接着，我们使用2D神经渲染将低分辨率特征图像上采样为更高分辨率的RGB图像。
+其中 $\tau_j$ 是透射率，$\alpha_j$ 是 $\mathbf{x}_j$ 的alpha值，$\delta_j = \|\|\mathbf{x}_{j+1} - \mathbf{x}_j \|\|_2$ 是相邻样本点之间的距离。于每个像素点上计算 $\pi_{\textrm{vol}}$ 即可得到整个特征图像。为了提高效率，我们以 $16^2$ 的分辨率渲染特征图像，该分辨率低于 $64^2$ 或 $256^2$ 像素点的输出分辨率。接着，我们使用2D神经渲染将低分辨率特征图像上采样为更高分辨率的RGB图像。
 
 ![图4:NeuralRenderer](https://s2.loli.net/2021/12/05/TisONPYgWfFH4yE.png)
 
@@ -170,7 +170,6 @@ $$
 $$
 
 使用权重 $\theta$ 将特征图像 $\mathbf{I}_V \in \mathbb{R}^{H_V \times W_V \times M_f}$ 映射为最终的合成图像 $\hat{\mathbf{I}} \in \mathbb{R}^{H \times W \times 3}$。我们将 $\pi_{\theta}^{\textrm{neural}}$ 参数化为使用Leaky ReLU[^56][^89]作为激活函数的2维卷积神经网络(CNN)，并将最近邻上采样与 $3 \times 3$ 卷积相结合以提高空间分辨率，如图4所示。我们选择较小的kernel尺寸且不使用中间层，即仅允许在空间上进行较小的细化以避免在图像合成过程中全局场景属性的耦合问题，同时也可以增加输出分辨率。受StyleGAN改进方法[^40]的启发，我们在每一个空间分辨率上将特征图像映射为一张RGB图片，并通过双线性上采样将前一个空间分辨率上的输出添加到下一个上。这种跳连方式确保了一个流向特征场的强梯度流。通过在最后一个RGB层上应用sigmoid激活函数便可获得我们最终的图像预测 $\hat{\mathbf{I}}$。我们在消融研究中验证了这种设计选择，如表4所示。
-
 
 $$
 \begin{array}{c|cccc}
