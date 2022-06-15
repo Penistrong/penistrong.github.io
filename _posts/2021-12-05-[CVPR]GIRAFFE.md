@@ -6,8 +6,8 @@ author:     Penistrong
 date:       2021-12-05 13:30:13 +0800
 categories: jekyll update
 catalog:    true
-mathjax:    true
-katex:      false
+mathjax:    false
+katex:      true
 tags:
     - GAN
     - CVPR
