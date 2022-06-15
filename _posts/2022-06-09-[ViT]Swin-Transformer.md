@@ -16,6 +16,7 @@ tags:
 # Swin Transformer 笔记
 
 [「Paper」Swin Transformer:Hierarchical Vision Transformer using Shifted Windows](https://arxiv.org/pdf/2103.14030.pdf)
+
 [「Code」 Official Repo](https://github.com/microsoft/Swin-Transformer)
 
 ## 从ViT引出的计算资源问题
@@ -209,8 +210,8 @@ class WindowAttention(nn.Module):
         M = self.window_size[0] # = self.window_size[1]
         # 注意相对位置偏置表的形状为[(2M-1) * (2M-1), nH]
         # 将前面得到的相对位置索引(形状为[M^2, M^2])拉直为1维后，将其值作为索引去取偏置表中的值
-        # 每个值张量的形状都是(1, nH)，一共取得M^4个偏置值
-        # 尔后再将取到的偏移值(M^4, nH)重新reshape为(M^2, M^2, nH)以得到每个注意力头使用的偏置参数矩阵B
+        # 每个值张量的形状都是(1, nH)，一共取得M^4个偏置值，shape=(M^4, nH)
+        # 尔后重新reshape为(M^2, M^2, nH)以得到注意力头使用的偏置参数矩阵B
         relative_position_bias = self.relative_position_bias_table[
             self.relative_position_index.view(-1)].view(M * M, M * M, -1)
         # 把num_heads所在维度调换到第0维，完成了B从\hat{B}中进行取值的过程，得到每个注意力头的偏置B
