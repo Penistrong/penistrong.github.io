@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Swin-Transformer笔记"
+title:      "[ViT]Swin Transformer"
 subtitle:   "技术细节与理解"
 author:     Penistrong
 date:       2022-06-09 16:31:35 +0800
@@ -13,7 +13,7 @@ tags:
     - CV
 ---
 
-# Swin Transformer 笔记
+# Swin Transformer: Hierarchical Vision Transformer using Shifted Windows
 
 [「Paper」Swin Transformer:Hierarchical Vision Transformer using Shifted Windows](https://arxiv.org/pdf/2103.14030.pdf)
 
