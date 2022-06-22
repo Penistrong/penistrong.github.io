@@ -8,8 +8,10 @@
                 <p class="copyright text-muted">
                     Copyright &copy; {{ site.title }} {{ site.time | date: '%Y' }}. All Rights Reserved.
                     <br>
-                    <img class="filings" src="{{ site.baseurl }}/{{ site.police_filings_icon }}">
-                    <a href="{{ site.police_filings_link }}" target="_blank">{{ site.police_filings_code }}</a> |
+                    <a href="{{ site.police_filings_link }}" target="_blank">
+                        <img class="filings" src="{{ site.baseurl }}/{{ site.police_filings_icon }}">
+                        {{ site.police_filings_code }}
+                    </a> |
                     <a href="{{ site.ICP_link }}" target="_blank">{{ site.ICP_code }}</a>
                 </p>
                 <p class="copyright text-muted" style="display:none">
