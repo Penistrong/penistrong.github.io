@@ -663,11 +663,20 @@ footer .copyright {
   margin-bottom: 0;
 }
 footer .copyright a {
-  color: #337ab7;
+  color: #777;
+  text-decoration: none;
 }
 footer .copyright a:hover,
 footer .copyright a:focus {
   color: #0085a1;
+}
+footer .copyright .filings{
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 3px;
+  vertical-align: middle;
+  background-repeat: no-repeat;
 }
 .floating-label-form-group {
   font-size: 14px;

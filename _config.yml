@@ -29,6 +29,13 @@ baseurl: "" # the subpath of your site, e.g. /blog.On VPS there is "/blog" while
 url: "penistrong.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 header-img: img/home-bg.jpg
 
+# Filings Settings
+ICP_code: "赣ICP备2022005569号"
+ICP_link: "https://beian.miit.gov.cn/"
+police_filings_code:  "鄂公网安备 42011102004899号"
+police_filings_link:  "http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42011102004899"
+police_filings_icon:  img/filings_icon.png
+
 # SNS settings
 RSS: false
 twitter_username:   _Penistrong_

@@ -6,9 +6,11 @@
                 <!-- SNS Link -->
                 {% include sns-links.html center=true %}
                 <p class="copyright text-muted">
-                    Copyright &copy; {{ site.title }} {{ site.time | date: '%Y' }}
+                    Copyright &copy; {{ site.title }} {{ site.time | date: '%Y' }}. All Rights Reserved.
                     <br>
-                    <a href="https://beian.miit.gov.cn/" target="_blank">赣ICP备2022005569号</a>
+                    <div class="filings" style="background-image: url('{{ site.baseurl }}/{{ site.police_filings_icon }}')"></div>
+                    <a href="{{ site.police_filings_link }}" target="_blank">{{ site.police_filings_code }}</a> |
+                    <a href="{{ site.ICP_link }}" target="_blank">{{ site.ICP_code }}</a>
                 </p>
                 <p class="copyright text-muted" style="display:none">
                     Theme by <a href="http://huangxuan.me">Hux</a> |
