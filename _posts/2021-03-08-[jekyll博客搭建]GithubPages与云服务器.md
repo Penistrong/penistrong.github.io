@@ -33,7 +33,7 @@ tags:
     jekyll serve --watch
     ```
 
-- 过了一段时间，由于GFW的封锁，我不得不将搭载v2ray服务端的[VPS使用TLS+WebSocket+Nginx进行改造]({% post_url /jekyll/update/2019-09-30-科学学习英语 %})，伪装网站流量。在一系列注册域名、设置dns解析、配置Nginx等等操作后，我突然萌生了一个想法：为什么不将VPS作为服务器部署自己的个人博客呢？而且这很容易做到，只需要在服务器端安装Ruby和jekyll，在服务端运行即可。于是我在VPS上git-clone了自己的penistrong.github.io.git仓库，安装依赖并配置Nginx后成功运行。
+- 过了一段时间，由于GFW的封锁，我不得不将搭载v2ray服务端的[VPS使用TLS+WebSocket+Nginx进行改造]({% post_url 2019-09-30-科学学习英语 %})，伪装网站流量。在一系列注册域名、设置dns解析、配置Nginx等等操作后，我突然萌生了一个想法：为什么不将VPS作为服务器部署自己的个人博客呢？而且这很容易做到，只需要在服务器端安装Ruby和jekyll，在服务端运行即可。于是我在VPS上git-clone了自己的penistrong.github.io.git仓库，安装依赖并配置Nginx后成功运行。
   - 使用`jekyll build`。将静态网站生成至服务器的域名网站目录下，使用增量更新，力求快速。
 
     ```shell
