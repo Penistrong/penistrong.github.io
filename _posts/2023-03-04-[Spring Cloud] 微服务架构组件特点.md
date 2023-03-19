@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "2023-03-14-[Spring Cloud] 微服务架构组件特点"
+title:      "[Spring Cloud] 微服务架构组件特点"
 subtitle:   "Nacos, Sentinel, Spring Cloud Gateway, RabbitMQ, etc."
 author:     Penistrong
 date:       2023-03-04 21:39:16 +0800
