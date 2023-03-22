@@ -398,3 +398,51 @@ Sorted Set即Zset，在Set的基础上增加了一个权重参数`score`，使�
 5) "v2"
 6) "5"
 ```
+
+## Redis线程模型
+
+## Redis内存管理
+
+## Redis持久化机制
+
+Redis作为内存型数据库的一种，它与Memcached最重要的一点区别就在于Redis支持持久化，通过将内存中的数据写入到硬盘，可以支持数据重用和数据备份。Redis支持两种不同的持久化操作，一种是快照，另一种是只追加文件
+
+### RDB持久化
+
+RDB 即 RedisDB，通过创建快照(Snapshot)获取内存中的数据在某个时间点的副本`.rdb`二进制文件，快照可以复制到其他服务器上进而创建具有相同数据的服务器副本(比如Redis主从结构的从节点)，还可以在重启Redis服务器时自动读取快照恢复数据
+
+RDB持久化方式是Redis**默认**采用的方式，在`redis.conf`中有以下默认配置
+
+```sh
+save 900 1          # 900秒内，如果至少有1个key发生变化，Redis就会触发bgsave命令创建快照
+
+save 300 10         # 300秒内，如果至少有10个key发生变化，Redis就会触发bgsave命令创建快照
+
+save 60 10000       # 60秒内，如果至少有10000个key发生变化，Redis就会触发bgsave命令创建快照
+```
+
+Redis提供了两个命令生成`.rdb`快照文件:
+
+- `save`: 同步保存操作，会阻塞Redis主进程
+
+- `bgsave`: 异步保存操作(background save)，fork出一个子进程，子进程保存快照，不会阻塞Redis主进程，**默认选项**
+
+### AOF持久化
+
+AOF 即 **A**ppend-**O**nly **F**ile，只追加文件，与快照持久化方式相比AOF持久化的实时性更好
+
+Redis默认情况下没有开启AOF持久化，可以在`redis.conf`中设置`appendonly`参数
+
+```sh
+appendonly yes
+```
+
+开启AOF持久化后，Redis每执行一条更改数据的命令，就会将该命令写入到内存缓存`server.aof_buf`中，然后再根据配置文件中的`appendfsync`参数来决定何时写入到硬盘里的AOF文件(其保存位置与`.rdb`文件相同，默认文件名`appendonly.aof`)
+
+```sh
+appendfsync always    # 每次有数据修改发生后都会fsync到硬盘中, 会造成Redis性能的严重损失
+appendfsync everysec  # 每秒钟同步一次，显式地同步到硬盘
+appendfsync no        # 让操作系统决定何时进行同步
+```
+
+推荐使用`appendfsync everysec`选项，让Redis每秒同步一次AOF文件，即使服务器宕机导致内存缓存`server.aof_buf`丢失，Redis也只会丢失1秒之内的数据更新
