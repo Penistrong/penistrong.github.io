@@ -18,13 +18,13 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Penistrong's Secret Blog
+title: Penistrong's Nano Blog
 SEOTitle: Penistrong的博客
-email: U201717014@hust.edu.cn
+email: chen18296276027@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  A normal postgraduate of HUST, WuHan.
-  Here are some conclusions of studying process in my UNiDays lol.
-keyword: "Penistrong, 陈立伟, blog"
+  Postgraduate of HUST, WuHan.
+  A few notes about my UNiDays lol.
+keyword: "Penistrong, API, blog"
 baseurl: "" # the subpath of your site, e.g. /blog.On VPS there is "/blog" while "" in penistrong.github.io
 url: "penistrong.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 header-img: img/home-bg.jpg
@@ -76,7 +76,7 @@ featured-condition-size: 1              # A tag will be featured if the size of 
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "陈立伟 or Penistrong <br> Put these foolish ambitions to rest."
+sidebar-about-description: "Penistrong, AKA API <br> Put these foolish ambitions to rest."
 sidebar-avatar:  /img/avatar-Penistrong.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 # Friends
@@ -93,10 +93,10 @@ friends: [
 
 # Programs
 programs: [
-    {
-        title: "AutoAlbum",
-        href: "http://www.penistrong.top/users/login"
-    },
+    #{
+    #    title: "AutoAlbum",
+    #    href: "http://www.penistrong.top/users/login"
+    #},
 ]
 
 # Exclude from processing.
