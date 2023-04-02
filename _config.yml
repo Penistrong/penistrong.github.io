@@ -45,7 +45,8 @@ zhihu_username:     chen-li-wei-32-18
 # Build settings
 theme: minima
 highlighter: rouge
-permalink: pretty
+# "pretty" is built-in format as "/:categories/:year/:month/:day/:title/"
+permalink: pretty                       # See https://jekyllrb.com/docs/permalinks/ this setting controls output url
 paginate: 10
 anchorjs: true                          # if you want to customize anchor. check out line:181 of `post.html`
 
