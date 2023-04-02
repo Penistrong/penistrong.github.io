@@ -4,14 +4,12 @@ title:      "[Data Structure]二叉树的概念及其扩展"
 subtitle:   "「数据结构」基础二叉树"
 author:     Penistrong
 date:       2018-12-04 10:38:08 +0800
-header-img: "img/post-bg/"
-categories: jekyll update
+categories: leetcode
 catalog: 	true
 mathjax: 	false
 katex: 		true
 tags:
     - DataStructure
-    - note
 ---
 
 ***数据结构 - 二叉树***

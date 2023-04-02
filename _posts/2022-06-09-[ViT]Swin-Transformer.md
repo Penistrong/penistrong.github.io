@@ -4,7 +4,7 @@ title:      "[ViT]Swin Transformer"
 subtitle:   "技术细节与理解"
 author:     Penistrong
 date:       2022-06-09 16:31:35 +0800
-categories: jekyll update
+categories: cv
 catalog:    true
 mathjax:    false
 katex:      true

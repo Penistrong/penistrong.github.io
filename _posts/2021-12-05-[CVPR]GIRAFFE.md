@@ -4,7 +4,7 @@ title:      "[CVPR2021 Best Paper]GIRAFFE: Representing Scenes as Compositional 
 subtitle:   "中文译文"
 author:     Penistrong
 date:       2021-12-05 13:30:13 +0800
-categories: jekyll update
+categories: cv
 catalog:    true
 mathjax:    false
 katex:      true

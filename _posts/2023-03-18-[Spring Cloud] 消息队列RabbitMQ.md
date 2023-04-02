@@ -4,7 +4,7 @@ title:      "[Spring Cloud] 消息队列与RabbitMQ"
 subtitle:   "消息队列概念与RabbitMQ知识点"
 author:     Penistrong
 date:       2023-03-18 17:38:30 +0800
-categories: jekyll update
+categories: java spring
 catalog:    true
 mathjax:    false
 katex:      true

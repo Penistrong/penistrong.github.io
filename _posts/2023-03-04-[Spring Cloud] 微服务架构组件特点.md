@@ -4,7 +4,7 @@ title:      "[Spring Cloud] 微服务架构组件特点"
 subtitle:   "Nacos, Sentinel, Spring Cloud Gateway, RabbitMQ, etc."
 author:     Penistrong
 date:       2023-03-04 21:39:16 +0800
-categories: jekyll update
+categories: java spring
 catalog:    true
 mathjax:    false
 katex:      true

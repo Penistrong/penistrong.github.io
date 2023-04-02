@@ -4,7 +4,7 @@ title:      "[jekyll博客搭建]模板js渲染与服务器主动渲染"
 subtitle:   "在博客中渲染LaTex的血泪史"
 author:     Penistrong
 date:       2021-03-08 18:17:38 +0800
-categories: jekyll update
+categories: misc
 catalog:    true
 mathjax:    false
 katex:      true
@@ -60,7 +60,7 @@ tags:
     url: "www.penistrong.top" # the base hostname & protocol for your site, e.g. http://example.com 
     ```
 
-- 在VPS上部署成功后，我就写了一篇包含数学推导的博文，使用了$LaTex$语法。但是这个时候就需要引入渲染LaTex的概念。由于是jekyll新手，我只是在官方文档中寻找是否有相关教程。查阅后得知可以通过安装jekyll-spaceship，即一款包含mathjax、emoji渲染器的jekyll plugin，在jekyll开启服务时可以渲染博文中的LaTex语法块为html代码块。当时比较仓促，**忘记查阅GitHub Page是否支持**，只是编写LaTex，运行jekyll服务进行渲染。在VPS上显示很正常。
+- 在VPS上部署成功后，我就写了一篇包含数学推导的博文，使用了$\LaTeX$语法。但是这个时候就需要引入渲染LaTex的插件。由于是jekyll新手，我只是在官方文档中寻找是否有相关教程。查阅后得知可以通过安装jekyll-spaceship，即一款包含mathjax、emoji渲染器的jekyll plugin，在jekyll开启服务时可以渲染博文中的LaTex语法块为html代码块。当时比较仓促，**忘记查阅GitHub Page是否支持**，只是编写LaTex，运行jekyll服务进行渲染。在VPS上显示很正常。
   - 安装`jekyll-spaceship`
 
     ```shell

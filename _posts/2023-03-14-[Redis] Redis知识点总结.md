@@ -4,11 +4,12 @@ title:      "[Redis] Redis知识点总结"
 subtitle:   "Redis相关基础知识"
 author:     Penistrong
 date:       2023-03-14 09:59:31 +0800
-categories: jekyll update
+categories: database
 catalog:    true
 mathjax:    false
 katex:      true
 tags:
+    - Database
     - Redis
 ---
 
