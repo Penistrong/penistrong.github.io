@@ -62,13 +62,21 @@ Bean被创建后交由Spring的IOC容器进行管理，而AOP这个面向切面�
 
    - 如果Bean实现了`InitializingBean`接口(利用`instanceof`判断)，执行`afterPropertiesSet()`方法
 
-   - 配置文件中Bean的属性里指定了`initMethod()`方法或者`@Bean(initMethod="")`给定了初始化方法，则去执行对应的`initMethod()`
+   - 配置文件中Bean的属性里指定了`init-method()`方法或者`@Bean(initMethod="")`给定了初始化方法，则去执行对应的`initMethod()`
 
 7. 初始化后(存在`BeanPostProcessor`对象)，进行`BeanPostProcessor`的后置处理
 
-   执行`postProcessAfterInitialization()`方法，这个时候AOP会根据该Bean的原始对象生成代理对象
+   执行`postProcessAfterInitialization()`方法，Spring AOP就是在该**初始化后**阶段利用`AnnotationAwareAspectJAutoProxyCreator`根据Bean的原始对象生成代理对象，同时代理对象里通过组合的方式引用了原始对象，保证原始对象不会被垃圾回收
 
-8. 正常使用，需要该Bean的时候由IOC自动注入该Bean
+8. 如果AOP接管了初始化后阶段，那么最终放入单例池的只是这个代理对象，否则放入的就是原始对象(在`postProcessAfterInitialization()`方法中其实可以完全替换掉对应的bean对象，因为**返回值是任意对象**)
+
+9. 正常使用，需要该Bean的时候由IOC自动注入该Bean
+
+10. IOC容器准备关闭，要销毁其中的Bean实例:
+
+    - 如果Bean实现了`DisposableBean`接口，执行实现的`destory()`方法
+
+    - 配置文件中Bean的属性里指定了`destroy-method()`方法或者`@Bean(destroyMethod="")`给定了销毁方法，则去执行对应的`destoryMethod()`
 
 ## Bean的依赖注入过程
 
