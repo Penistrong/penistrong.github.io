@@ -18,9 +18,25 @@ tags:
 
 ## Nacos
 
+Nacos全称Naming and Configuration Serivce，同时扮演了服务注册中心和配置中心的角色，是分布式系统(微服务架构)中不可或缺的一角
+
+### 注册中心 Naming Service
+
 ![Nacos服务注册与服务发现](https://s2.loli.net/2023/03/31/A7i6HqMLfotBdey.png)
 
-Nacos集群中各个节点的数据一致性可以由两种分布式协议达成，其一是Raft协议，选举Leader进行数据写入；其二是Distro协议，侧重可用性(或最终一致性)的分布式一致性协议
+Nacos集群中各个节点的数据一致性可以由两种分布式协议达成，其一是Raft协议，选举Leader进行数据写入，即CP架构；其二是Distro协议，侧重可用性(或最终一致性)的分布式一致性协议，即AP架构
+
+Nacos注册中心可以同时使用CP+AP模式管理节点：
+
+需要被Nacos服务注册中心(Naming服务)管理的服务实例默认以AP模式启动，如果需要设置为CP，就在配置服务实例的启动参数`spring.cloud.nacos.discovery.ephemeral=false`(默认为true)
+
+设置为CP模式启动的节点，就是持久化节点，Nacos管理持久化节点不会因为其不在运行而主动剔除，而是将其标记为不健康状态，而这种健康检查是由Nacos发起的"主动探活"请求完成的
+
+除了持久化节点，大部分服务实例节点都是以"临时节点"的身份存在，临时节点需要主动发送心跳请求向服务器报备自身状态
+
+### 配置中心 Configuration Service
+
+### 数据模型
 
 ## Sentinel
 
