@@ -29,7 +29,7 @@ Bean被创建后交由Spring的IOC容器进行管理，而AOP这个面向切面�
 
    - 根据`includeFilter`、`@Conditional`等注解判断相关类是否应该被解析为Bean
 
-   - 利用`AnnotationBeanNameGenerator`生成BeanName(`@Component`注解可以配置`BeanName`参数，没有的话默认按照类名生成)，最后将类上使用的其他注解赋值给`BeanDefinition`
+   - 利用`AnnotationBeanNameGenerator`生成BeanName(`@Component`注解可以配置`BeanName`参数，没有的话默认按照类名首字母小写生成，如果类名两个字母大写则Bean的名字与类名一致)，最后将类上使用的其他注解赋值给`BeanDefinition`
 
    - 最后将`BeanName`和`BeanDefinition`存入`beanDefinitionMap<BeanName, BeanDefinition>`中，完成注册
 
@@ -72,7 +72,7 @@ Bean被创建后交由Spring的IOC容器进行管理，而AOP这个面向切面�
 
 9. 正常使用，需要该Bean的时候由IOC自动注入该Bean
 
-10. IOC容器准备关闭，要销毁其中的Bean实例:
+10. Spring应用上下文关闭时，IOC容器准备关闭，要销毁其中的Bean实例:
 
     - 如果Bean实现了`DisposableBean`接口，执行实现的`destory()`方法
 
