@@ -179,11 +179,11 @@ Queue会一直保存消息，直到订阅它的消费者连接到该队列后将
 
   2. **镜像集群**：通过`ha-mode`指明镜像队列模式，包括`all`(在集群所有节点上进行镜像)、`exactly`(在指定个数节点上进行镜像)、`nodes`(在指定节点上进行镜像)；同时通过`ha-params`给出`ha-mode`不同模式下需要的参数比如节点个数或者节点名称。最后通过`ha-sync-mode`设定队列中消息的同步方式，包括自动和手动。注意设定镜像时可以使用正则表达式匹配想要镜像的队列名称
 
-    ```sh
-    rabbitmqctl set_policy [-p <vhost>] [--priority <priority>] [--apply-to <apply-to>] <name> <pattern>  <definition>
-    ```
+     ```sh
+     rabbitmqctl set_policy [-p <vhost>] [--priority <priority>] [--apply-to <apply-to>] <name> <pattern>  <definition>
+     ```
 
-    > 注意**主从集群**并不能保证消息可靠性，队列里的消息只存在于主节点，从节点只负责队列转发，当订阅了从节点的消费者需要消费消息时，从节点是去主节点对应队列中取出消息再转发，一旦主节点宕机，队列里的消息还是丢失了
+     > 注意**主从集群**并不能保证消息可靠性，队列里的消息只存在于主节点，从节点只负责队列转发，当订阅了从节点的消费者需要消费消息时，从节点是去主节点对应队列中取出消息再转发，一旦主节点宕机，队列里的消息还是丢失了
 
   3. RabbitMQ到消费者:
 
