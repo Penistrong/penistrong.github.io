@@ -357,6 +357,26 @@ protected boolean isHeldExclusively()
 
 ## ReentrantLock
 
+首先要说明的是，ReentrantLock实现了`java.uti.concurrent.locks.Lock`接口，Lock接口为J.U.C的显式锁定义了共性方法，即:
+
+```java
+void lock();  // 阻塞模式抢占锁，未抢占到时当前线程会一直阻塞
+
+void lockInterruptibly(); // 可中断模式抢占锁，阻塞过程中能够接收中断信号中断当前线程
+
+boolean tryLock();  // 非阻塞模式抢占锁，直接返回抢占锁的结果
+
+boolean tryLock(Long time, TimeUnit unit);  // 在tryLock()基础上，限制抢占锁的时间限制(在时间限制里一直阻塞以抢占到锁)，超出时间后立刻返回结果
+
+void unlock();  // 释放当前线程抢占到的锁
+
+Condition newCondition(); // 创建与当前线程绑定的Condition条件，用于线程间"等待-通知"方式的通信
+```
+
+Lock锁弥补了JVM内置锁`synchronized`的不足，支持中断响应、超时、非阻塞抢占，且通过多个与锁绑定的Condition对象，实现更精细的等待唤醒控制。(`synchronized`代码块中只能对唯一的锁对象调用`wait`、`notify`等方法)
+
+ReentrantLock是最常用的Lock实现，基于AQS实现了Lock接口定义的方法
+
 ReentranLock的内部类`Sync`队列继承自AQS，即线程在竞争ReentrantLock提供的锁时，底层都会使用`Sync`队列进行排队
 
 根据ReentrantLock初始化时给定的`boolean fair`参数决定是否是公平锁，加锁时:
