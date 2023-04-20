@@ -400,6 +400,51 @@ ReentranLock的内部类`Sync`队列继承自AQS，即线程在竞争ReentrantLo
 
 `try_lock()`方法为非阻塞加锁方法，尝试一次加锁，如果成功则返回true，失败则返回false，开发者可以控制下方代码是否需要继续执行，而不是一直阻塞到加到锁为止
 
+### await()、signal()、signalAll()
+
+与`synchronized`不同的是，持有ReentrantLock锁的线程想要进入无限期等待(WAITING)状态和限期等待(TIMED_WAITING)状态，是通过调用与Lock锁绑定的Condition对象的`await()`等方法实现的(底层调用了`LockSupport.park()`方法)
+
+由于`synchronized`处理的是一个单一的锁对象，JVM实现`synchronized`是通过将锁对象关联到一个Monitor对象，而后者具有两个队列`_EntryList`和`_WaitSet`分别保存因获取不到锁而阻塞(BLOCKED)的线程和持有锁时主动调用`wait()`进入等待状态(包括限期等待与无限期等待)的线程
+
+ReentrantLock优化了这个缺点，由Condition对象内部维护一个存储等待状态线程的双向队列，一个Lock锁可以创建多个ConditionObject，自然可以拥有多个等待队列，实现更全面、精细的"等待-通知"线程通信机制
+
+`signal()`/`signalAll()`方法对标`notify()`/`notifyAll()`方法，前两者的源码中其实调用的是`LockSupport.unpark(Thread)`方法，唤醒被调用的条件对象ConditionObject维护的等待队列中的线程
+
+```java
+// in java.util.concurrent.locks.AbstractQueuedSynchronizer::ConditionObject.class
+private void doSignal(ConditionNode first, boolean all) {
+    while (first != null) {
+        ConditionNode next = first.nextWaiter;
+        if ((firstWaiter = next) == null)
+            lastWaiter = null;
+        if ((first.getAndUnsetStatus(COND) & COND) != 0) {
+            enqueue(first);
+            if (!all)
+                break;
+        }
+        first = next;
+    }
+}
+
+final void enqueue(Node node) {
+        if (node != null) {
+            for (;;) {
+                Node t = tail;
+                node.setPrevRelaxed(t);        // avoid unnecessary fence
+                if (t == null)                 // initialize
+                    tryInitializeHead();
+                else if (casTail(t, node)) {
+                    t.next = node;
+                    if (t.status < 0)          // wake up to clean link
+                        LockSupport.unpark(node.waiter);
+                    break;
+                }
+            }
+        }
+    }
+
+```
+
 ## 死锁原因与避免
 
 Java中如果出现死锁，其4个充分必要条件如下：
