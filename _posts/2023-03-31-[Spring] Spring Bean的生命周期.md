@@ -82,7 +82,63 @@ Bean被创建后交由Spring的IOC容器进行管理，而AOP这个面向切面�
 
 ## Bean的循环依赖问题与解决方式
 
-Spring利用三级缓存`singletonObjects`、`earlySingletonObjects`、`singletonFactories`
+Bean的循环依赖问题是指，在初始化Bean `A`走到依赖注入的步骤时，发现其需要注入Bean `B`，但是单例池中并没有该Bean `B`，于是先去创建Bean `B`，但是Bean `B` 也依赖于Bean `A`，而后者还没有初始化完毕，从而导致循环依赖问题
+
+Spring利用了三级缓存`singletonObjects`、`earlySingletonObjects`、`singletonFactories`解决该问题
+
+### 为什么是三级缓存而不是二级缓存?
+
+**如果只从IOC的角度上考虑**，只需要在单例池这个一级缓存之外再添加一个二级缓存`earlySingletonObjects`即可：即，在实例化Bean `A`的原始对象后，就将其加入二级缓存中，在对Bean `B`进行依赖注入时，如果单例池没有初始化完毕的Bean `A`，就去二级缓存中获取Bean `A`原始对象的引用，完成依赖注入过程
+
+考虑到Spring的另一大核心功能**AOP**，由于AOP是在**初始化后**阶段对原始对象进行代理，利用JDK动态代理或者CGLIB生成代理对象后，**并让原始对象以组合的方式作为代理对象的字段之一**
+
+这样就会出现一个问题，如果二级缓存中存放的是还未初始化完成(**提前暴露**)的原始对象，那么Bean `B`在初始化时如果直接使用Bean `A`的原始对象，那么Bean `A`被AOP所处理的增强逻辑就不会被Bean `B`执行(Bean `B`执行方法时用的是Bean `A`的原始对象而不是代理对象)
+
+所以Spring需要引入第三级缓存`singletonFactories`解决AOP的问题
+
+### 三级缓存处理过程
+
+> 假设Bean `A`依赖Bean `B`，而Bean `A`的部分方法被AOP代理(比如`@Transactional`等)
+
+在实例化Bean `A`的原始对象后，Spring会构造一个`ObjectFactory`存入第三级缓存`singletonFactories`中，以`<BeanName, ObjectFactory>`键值对形式存入Map中
+
+`ObjectFactory`是一个函数式接口，其中定义的`getObject()`方法可以传入一个Lambda表达式，在Spring的处理中是传入`() -> getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean)`这个Lambda表达式作为该工厂接口的实现
+
+`getEarlyBeanReference()`这个方法在`SmartInstantiationAwareBeanPostProcessor`接口中被定义，而整个Spring中只有`AbstractAutoProxyCreator`类实现了该方法，Spring AOP的处理类就是`AnnotationAwareAspectJAutoProxyCreator`，该类的父类就是`AbstractAutoProxyCreator`
+
+```java
+// in AbstractAutoProxyCreator
+private final Map<Object, Object> earlyProxyReferences = new ConcurrentHashMap(16);
+
+@Override
+public Object getEarlyBeanReference(Object bean, String beanName) {
+   Object cacheKey = this.getCacheKey(bean.getClass(), beanName);
+   this.earlyProxyReferences.put(cacheKey, bean);
+   return wrapIfNecessary(bean, beanName, cacheKey);
+}
+```
+
+在依赖注入时，发现所需的Bean `B`还没有创建，于是先去初始化Bean `B`，后者的依赖注入过程中需要用到Bean `A`(由AOP的逻辑，这里注入的应该是Bean `A`的代理对象)，检查一级缓存`singletonObjects`和二级缓存`earlySingletonObjects`中是否有Bean `A`的实例。如果都没有，就去第三级缓存`singletonFactories`根据BeanName获取对应的`ObjectFactory`，执行该工厂类的`getObject()`方法就会调用传入的Lambda表达式里的`getEarlyBeanReference()`方法，提前对Bean `A`的原始对象进行AOP代理，返回代理对象**并将其放到二级缓存`earlySingletonObjects`中**，该代理对象内部持有对原始对象的引用，但是该原始对象还未完成依赖注入过程，因此不能将该代理对象直接丢到一级缓存`singletonObjects`中
+
+尔后，Bean `B`或者依赖了Bean `A`的其他Bean就可以直接从二级缓存`earlySingletonObjects`中得到Bean `A`原始对象的代理对象，完成依赖注入过程，最终Bean `B`被存储到一级缓存`singletonObjects`里
+
+Bean `B`创建完毕后，继续Bean `A`的依赖注入阶段，原始对象完成属性填充。尔后，循序渐进到“初始化后”阶段时，负责AOP处理的`AnnotationAwareAspectJAutoProxyCreator`(BeanPostProcessor)调用其父类`AbstractAutoProxyCreator`的`postProcessAfterInitialization()`方法，判断Bean `A`的BeanName是否已存在于`AbstractAutoProxyCreator`内部的`earlyProxyReferences`表中，若存在则说明在之前的循环依赖解决过程中已经提前进行过AOP，无需再次进行AOP，直接跳过不处理
+
+```java
+// in AbstractAutoProxyCreator
+public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
+   if (bean != null) {
+      Object cacheKey = this.getCacheKey(bean.getClass(), beanName);
+      if (this.earlyProxyReferences.remove(cacheKey) != bean) {
+            return this.wrapIfNecessary(bean, beanName, cacheKey);
+      }
+   }
+
+   return bean;
+}
+```
+
+最后，Bean `A`走完整个创建周期后(所有的BeanPostProcessor都执行完毕)，，此时Bean `A`的代理对象是存放在二级缓存`earlySingletonObjects`中，从二级缓存取出代理对象放入一级缓存中，解决了整个循环依赖问题
 
 ## Bean的线程安全问题
 
