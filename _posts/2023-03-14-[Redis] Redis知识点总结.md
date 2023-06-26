@@ -245,6 +245,8 @@ OK
 (integer) 1
 ```
 
+**内部实现**：
+
 ### List 列表
 
 ![List](../img/in-post/redis/data-structures-_lists.svg)
@@ -270,6 +272,8 @@ OK
 > RPOP list # 右端出队并返回
 "e3"
 ```
+
+**内部实现**：
 
 ### Hash 散列
 
@@ -306,6 +310,8 @@ OK
 > HINCRBY hash id -1 # 对指定的数字类型字段进行简单加减运算
 (integer) 123455
 ```
+
+**内部实现**：
 
 ### Set 集合
 
@@ -345,6 +351,8 @@ Redis的Set是无须集合，元素没有先后顺序但保证唯一，类似Jav
 > SRANDMEMBER set2 1 # 随机获取指定个数的元素(不移除)
 1) "v3"
 ```
+
+**内部实现**：
 
 ### Zset 有序集合
 
@@ -400,11 +408,161 @@ Sorted Set即Zset，在Set的基础上增加了一个权重参数`score`，使�
 6) "5"
 ```
 
+**内部实现**：
+
+*Redis 7.0*之前，Zset底层数据结构由 压缩列表`ziplist` **或** 跳表`skiplist`实现:
+
+- 当`key`对应的有序集合中元素小于`128`且**每个元素**占据空间小于`64`字节时，Redis会使用`ziplist`作为Zset的底层数据结构
+
+- 不满足上述条件时，就会使用`skiplist`作为Zset的底层数据结构
+  
+自*Redis 7.0*开始，`ziplist`被废弃，转而使用`listpack`
+
+## 底层数据结构详解
+
+### 双向链表 list
+
+### 压缩列表 ziplist
+
+*Redis 7.0*前使用压缩列表这种内存紧凑的数据结构，占用一块连续内存空间，利用了CPU的缓存策略，有效节省内存开销，在Redis的`List`、`Hash`、`Zset`类型中，当它们包含的元素数量较少且不大时都使用压缩列表作为其底层数据结构
+
+ziplist是由连续内存块组成的顺序型数据结构，通过表头3个字段和表尾1个字段进行定界
+
+表头3个字段依次为:
+
+- `zlbytes`: 记录ziplist占用内存的**字节数**
+
+- `zltail`: 记录ziplist的**尾部**节点距离ziplist内存起始地址的偏移量，单位为字节
+
+- `zllen`: 记录ziplist包含的节点总数
+
+表尾的字段为:
+
+- `zlend`: 标记ziplist的结束点，该定界符固定值为一个字节的`0xFF`
+
+由于`zltail`字段的存在，可以用O(1)的时间定位到尾部元素，但是对于非首尾节点，就需要O(N)的顺序查找时间复杂度，**所以ziplist不适合保存过多元素，当元素过多时就会转为其他数据结构**
+
+ziplist中每个节点`entry`也是一个数据结构，包含3部分:
+
+- `prevlen`: 记录**前1个节点**的长度，该字段存在的目的是为了实现倒序遍历，该字段实际占用的内存空间大小跟前一个节点的长度值有关:
+
+  1. 如果**前1个节点长度小于254字节**，那么`prevlen`长度为 1B
+  
+  2. 如果**前1个节点长度大于等于254字节**, 那么`prevlen`长度为 5B
+
+- `encoding`: 记录当前节点实际数据的类型和长度，其中类型只有2种: 字符串 or 整数
+
+  1. 如果当前节点数据是整数，则`encoding`只使用 1B 空间进行编码，其中会标识整型类型，比如`int16/32/64`，Redis还额外增加了24位/8位整数
+  
+  2. 如果当前节点数据是字符串，根据字符串实际长度，`encoding`会使用 1B / 2B / 5B 的空间进行编码，前两个bit分别对应`00`、`01`、`10`，后续的bit用于标识字符串的实际长度
+
+- `data`: 记录当前节点的实际数据
+
+往ziplist中插入数据时，就会根据数据类型及其大小分配实际空间，保证各个节点之间内存分配紧凑，节省内存空间
+
+**缺点**:
+
+- 元素过多时,O(N)的查询效率有点过低
+
+- 新增或者修改元素时，需要对压缩列表占据的连续内存空间进行重新分配，甚至引发连锁更新问题
+
+  即压缩列表新增或修改某个元素时，如果空间不够就需要重新分配，而由于`prevlen`设计时存在不同的长度(1B 或者 5B)，如果在某个`prevlen`为1B的节点前面插入一个**大于等于254B**的节点，就会导致当前节点要将`prevlen`扩展到5B，最差情况下如果当前节点长度在250~253B之间，扩展后导致后面的节点全部被连锁更新，极大影响性能
+
+针对压缩列表的不足，*Redis 3.2*引入快表quicklist，*Redis 5.0*引入listpack，*Redis 7.0*之后将所有用到压缩列表的Redis对象全部替换成listpack实现
+
+### 快表 quicklist
+
+*Redis 3.0*前List对象的底层数据结构采用双向链表或者压缩列表实现，自*Redis 3.2*开始，改为单一的quicklist实现
+
+快表整体上看就是一个双向链表，但其中每个链表节点又是一个压缩列表。quicklist的目标是为了解决压缩列表的缺点，它通过控制每个链表节点中压缩列表的大小或者元素个数，规避连锁更新导致的问题
+
+```c++
+typedef struct quicklist
+{
+  quicklistNode *head;  // 双向链表表头
+  quicklistNode *tail;  // 双向链表表尾
+  unsigned long count;  // 所有节点(压缩列表)中元素总个数
+  unsigned long len;    // 节点个数
+  ...
+} quicklist;
+
+typedef struct quicklistNode
+{
+    struct quicklistNode *prev; // 前一个节点指针
+    struct quicklistNode *next; // 后一个节点指针
+    unsigned char *zl;          // 当前节点对应的压缩列表
+    unsigned int sz;            // 压缩列表的大小size，单位字节
+    unsigned int count : 16;    // 压缩列表中的元素个数
+    ...
+} quicklistNode;
+```
+
+向quicklist中插入元素时，首先是检查插入位置对应的压缩列表能否容纳该元素，若能则直接保存到对应quicklistNode中的压缩列表里，如果不能再新建一个quicklistNode节点
+
+这里的"能"与"不能"是指quicklist会控制节点中的压缩列表大小上限或者元素个数上限，规避全表连锁更新的风险，但是每一个快表节点内的压缩列表还是会出现局部的连锁更新问题
+
+### 紧凑列表 listpack
+
+为了彻底解决连锁更新问题，替代ziplist，自`Redis 7.0`起将所有使用ziplist作为底层数据结构的对象全部更改为紧凑列表listpack实现
+
+listpack表头具有2个字段，表尾1个字段，每个listpack节点内部包含3部分
+
+表头:
+
+1. `tot-bytes`: listpack总长度，单位字节数，长度4B
+
+2. `num-elements`: listpack节点数量，长度2B
+
+节点(`element`):
+
+1. `encoding-type`: 当前节点数据的编码类型，仍是整数和字符串两种
+
+2. `element-data`: 实际数据
+
+3. `element-tot-len`: `encoding` + `data` 的总长度，不包括`len`字段本身
+
+表尾:
+
+`listpack-end-type`: listpack结尾定界符，1B的`0xFF`
+
+由于listpack的节点中不再记录前一个节点的长度，向listpack中插入节点不会导致后续节点的长度字段的变化，避免了连锁更新问题
+
+listpack仍然支持倒序遍历，通过解码每个节点中最后一个字段`element-tot-len`，计算当前节点占用的大小，向前移动同样的偏移量即可查找到上一个节点
+
+### 整数集合 intset
+
+Set对象的底层数据结构之一为整数集合intset，当Set对象只包含整数值元素且元素数量小于`512`(可根据`set-maxintset-entries`配置)，就会采用整数集合，否则采用哈希表`dictht`
+
+```c++
+typedef struct intset
+{
+    uint32_t encoding;      // 编码方式
+    uint32_t length;        // 集合包含的元素数量
+    int8_t contents[];      // 保存实际元素的数组
+} intset;
+```
+
+intset的`encoding`属性有3种，contents数组中存储的也是对应整型的元素:
+
+- `INTSET_ENC_INT16`
+
+- `INTSET_ENC_INT64`
+
+**整数集合的类型升级**:
+
+将一个新元素加入到整数集合时，如果新元素类型长于整数集合当前存储元素的类型时(比如`int32_t`元素存入`int16_t`的整数集合中)，需要对原contents数组按照新类型`int32_t`进行类型扩展
+
+即，每个以`int16_t`类型存储的元素从2字节扩展到4字节的`int32_t`
+
+### 哈希表 dictht
+
 ## Redis线程模型
 
-## Redis内存管理
+## 过期删除机制
 
-## Redis持久化机制
+## 内存淘汰机制
+
+## 持久化机制
 
 Redis作为内存型数据库的一种，它与Memcached最重要的一点区别就在于Redis支持持久化，通过将内存中的数据写入到硬盘，可以支持数据重用和数据备份。Redis支持两种不同的持久化操作，一种是快照，另一种是只追加文件
 
