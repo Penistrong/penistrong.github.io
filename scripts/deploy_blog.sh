@@ -12,9 +12,9 @@ do
     destination="$DESTINATION_PATH_PREFIX/$line/$DESTINATION_PATH_SUFFIX"
     echo $destination
 
-    sed -i "s#url: "$OG_SITE_URL"#url: "$line"#g" ../_config.yml
+    sed -i "s#url: \"$OG_SITE_URL\"#url: \"$line\"#g" ../_config.yml
     jekyll build --source ../ --destination $destination
-    sed -i "s#url: "$line"#url: "$OG_SITE_URL"#g" ../_config.yml
+    sed -i "s#url: \"$line\"#url: \"$OG_SITE_URL\"#g" ../_config.yml
 
     loop=`expr $loop + 1`
 done < $1
