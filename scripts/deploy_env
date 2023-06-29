@@ -1,0 +1,3 @@
+OG_SITE_URL=penistrong.github.io
+DESTINATION_PATH_PREFIX=/www/wwwroot
+DESTINATION_PATH_SUFFIX=blog_site
