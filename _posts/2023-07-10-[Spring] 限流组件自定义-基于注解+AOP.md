@@ -104,7 +104,7 @@ public class Limiter {
 
 对被注解接口进行限流的执行逻辑由Spring AOP实现，将注解的属性转换为实际的`Limiter`对象，由`LimiterManager`接口的实现类执行限流
 
-```Java
+```java
 @Aspect
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @Component
@@ -159,16 +159,15 @@ public static final String LIMIT_ENABLED = "limiter.enabled";
 public class LimiterException extends RuntimeException {
 
     public LimiterException(String msg) {
-        super(ErrorCode.FAIL_OPERATION, msg);
+        super(msg);
     }
 
     public LimiterException(Exception e) {
-        super(ErrorCode.FAIL_OPERATION, e);
+        super(e);
     }
 
     public LimiterException(String msg, Exception e) {
-        super(ErrorCode.FAIL_OPERATION, e);
-        this.setMessage(msg);
+        super(msg, e);
     }
 }
 ```
