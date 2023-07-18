@@ -90,27 +90,39 @@ $$
 \begin{align*}
 \textrm{LHS} &= qvq^{*} \\
              &= [\cos{\frac{\theta}{2}}, \sin{\frac{\theta}{2}}\vec{u}] [0, \vec{v}] [\cos{\frac{\theta}{2}}, -\sin{\frac{\theta}{2}}\vec{u}] \tag*{(\textrm{四元数乘法})} \\
-             &= \left[0 - \sin{\frac{\theta}{2}}\vec{u} \cdot \vec{v}, \cos{\frac{\theta}{2}}\vec{v} + 0 + \sin{\frac{\theta}{2}}\vec{u} \times \vec{v} \right] \left[\cos{\frac{\theta}{2}}, -\sin{\frac{\theta}{2}}\vec{u} \right] \tag*{(\textrm{利用Graßmann积})} \\
-             &= \left[-\sin{\frac{\theta}{2}}\vec{u} \cdot \vec{v}, \cos{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}}\vec{u} \times \vec{v} \right] \left[\cos{\frac{\theta}{2}}, -\sin{\frac{\theta}{2}}\vec{u} \right] \\
-             &= \left[
-                -\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \cdot \vec{v} -
-                \left( \cos{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}\vec{u} \times \vec{v}} \right) \cdot \left( -\sin{\frac{\theta}{2}}\vec{u} \right),
-                \left( -\sin{\frac{\theta}{2}}\vec{u} \cdot \vec{v} \right)\left( -\sin{\frac{\theta}{2}}\vec{u} \right) +
-                \cos{\frac{\theta}{2}} \left( \cos{\frac{\theta}{2}\vec{u}} + \sin{\frac{\theta}{2}}\vec{u} \times \vec{v} \right) + 
-                \left( \cos{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}\vec{u} \times \vec{v}} \right) \times \left( -\sin{\frac{\theta}{2}}\vec{u} \right)
-                \right] \\
-             &= 
+             &= \left[-\sin{\frac{\theta}{2}}\vec{u} \cdot \vec{v}, \cos{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}}\vec{u} \times \vec{v} \right] \left[\cos{\frac{\theta}{2}}, -\sin{\frac{\theta}{2}}\vec{u} \right] \tag*{(\textrm{利用Graßmann积})} \\
 \end{align*}
 $$
 
-$$
-q = [\cos{\frac{\theta}{2}}, sin{\frac{\theta}{2}}\vec{u}]
-$$
-
-任意向量 $\vec{v}$ 沿着以单位向量 $\vec{u}$ 定义的旋转轴旋转 $\theta$ 度之后的$\vec{v'}$可以使用四元数乘法获得(向量扩展为纯四元数形式):
+分别计算上述式子中两个四元数乘积的实部和虚部:
 
 $$
-\begin{equation}
-v' = qvq^{*} = qvq^{-1}
-\end{equation}
+\begin{align*}
+\Re &= -\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \cdot \vec{v} - \left( \cos{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}\vec{u} \times \vec{v}} \right) \cdot \left( -\sin{\frac{\theta}{2}}\vec{u} \right) \\
+    &= -\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \cdot \vec{v} + \sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \cdot \vec{v} + \sin^2{\frac{\theta}{2}}(\vec{u} \times \vec{v}) \cdot \vec{u} \\
+    &\xlongequal{(\vec{u} \times \vec{v}) \cdot \vec{u} = 0} 0 \\[10px]
+\Im &= \left( -\sin{\frac{\theta}{2}}\vec{u} \cdot \vec{v} \right) \left( -\sin{\frac{\theta}{2}}\vec{u} \right)
+       +\cos{\frac{\theta}{2}} \left( \cos{\frac{\theta}{2}\vec{v}} + \sin{\frac{\theta}{2}}\vec{u} \times \vec{v} \right) \\
+    & ~~~~ + \left( \cos{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}\vec{u} \times \vec{v}} \right) \times \left( -\sin{\frac{\theta}{2}}\vec{u} \right) \\
+    &= \sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + \cos^2{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \times \vec{v} - \sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{v} \times \vec{u} \\
+    & ~~~~ - \sin^2{\frac{\theta}{2}}(\vec{u} \times \vec{v}) \times \vec{u} \tag*{(\textrm{叉积反交换律})} \\
+    &= \sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + \cos^2{\frac{\theta}{2}}\vec{v} + 2\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \times \vec{v} + \sin^2{\frac{\theta}{2}}\vec{u} \times (\vec{u} \times \vec{v}) \\
+    &= \sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + \cos^2{\frac{\theta}{2}}\vec{v} + 2\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \times \vec{v} \\
+    & ~~~~ + \sin^2{\frac{\theta}{2}}\left[ (\vec{u} \cdot \vec{v}) \cdot \vec{u} - (\vec{u} \cdot \vec{u}) \cdot \vec{v} \right] \tag*{(\textrm{矢量三重积})} \\
+    &= 2\sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + 2\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}(\vec{u} \times \vec{v}) + \left( \cos^2{\frac{\theta}{2}} - \sin^2{\frac{\theta}{2}} \right)\vec{v} \\
+    &= \cos{\theta}\vec{v} + (1 - \cos{\theta})(\vec{u} \cdot \vec{v})\vec{u} + \sin{\theta}(\vec{u} \times \vec{v})
+\end{align*}
 $$
+
+化简完实部与虚部后则有:
+
+$$
+\begin{align*}
+\textrm{LHS} &= qvq^{*} \\
+             &= \left[ \Re, \Im \right] \\
+             &= \left[ 0, \cos{\theta}\vec{v} + (1 - \cos{\theta})(\vec{u} \cdot \vec{v})\vec{u} + \sin{\theta}(\vec{u} \times \vec{v}) \right] \\
+             &= \textrm{RHS}
+\end{align*}
+$$
+
+式(3)得证，充分说明了四元数型旋转公式与罗德里格斯公式的等价性，可见**对于计算机而言**利用四元数计算旋转后的向量要比直接使用罗德格里斯公式计算简洁得多
