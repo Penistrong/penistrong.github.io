@@ -6,8 +6,8 @@ author:     Penistrong
 date:       2023-07-18 14:30:41 +0800
 categories: jekyll update
 catalog:    true
-mathjax:    false
-katex:      true
+mathjax:    true
+katex:      false
 tags:
     - OpenCV
 ---
