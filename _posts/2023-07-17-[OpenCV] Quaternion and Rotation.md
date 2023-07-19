@@ -101,9 +101,9 @@ $$
 \Im &= \left( -\sin{\frac{\theta}{2}}\vec{u} \cdot \vec{v} \right) \left( -\sin{\frac{\theta}{2}}\vec{u} \right)
        +\cos{\frac{\theta}{2}} \left( \cos{\frac{\theta}{2}\vec{v}} + \sin{\frac{\theta}{2}}\vec{u} \times \vec{v} \right) \\
     & ~~~~ + \left( \cos{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}\vec{u} \times \vec{v}} \right) \times \left( -\sin{\frac{\theta}{2}}\vec{u} \right) \\
-    &\xlongequal{\textrm{叉积反交换律}} \sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + \cos^2{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \times \vec{v} \\
+    &= \sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + \cos^2{\frac{\theta}{2}}\vec{v} + \sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \times \vec{v} \\
     & ~~~~~~~~~~~~~~~~~~~~~ - \sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{v} \times \vec{u} - \sin^2{\frac{\theta}{2}}(\vec{u} \times \vec{v}) \times \vec{u} \\
-    &= \sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + \cos^2{\frac{\theta}{2}}\vec{v} + 2\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \times \vec{v} + \sin^2{\frac{\theta}{2}}\vec{u} \times (\vec{u} \times \vec{v}) \\
+    &\xlongequal{\textrm{叉积反交换律}} \sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + \cos^2{\frac{\theta}{2}}\vec{v} + 2\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \times \vec{v} + \sin^2{\frac{\theta}{2}}\vec{u} \times (\vec{u} \times \vec{v}) \\
     &\xlongequal{\textrm{矢量三重积}} \sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + \cos^2{\frac{\theta}{2}}\vec{v} + 2\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}\vec{u} \times \vec{v} \\
     & ~~~~~~~~~~~~~~~~~~ + \sin^2{\frac{\theta}{2}}\left[ (\vec{u} \cdot \vec{v}) \cdot \vec{u} - (\vec{u} \cdot \vec{u}) \cdot \vec{v} \right] \\
     &= 2\sin^2{\frac{\theta}{2}}(\vec{u} \cdot \vec{v})\vec{u} + 2\sin{\frac{\theta}{2}}\cos{\frac{\theta}{2}}(\vec{u} \times \vec{v}) + \left( \cos^2{\frac{\theta}{2}} - \sin^2{\frac{\theta}{2}} \right)\vec{v} \\
