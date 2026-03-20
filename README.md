@@ -16,6 +16,17 @@ Plugins:
 
 ```sh
 yum install ruby ruby-devel
+```
+
+### Ubuntu / Debian
+
+```sh
+apt-get install ruby ruby-dev
+```
+
+### Ruby Gem
+
+```sh
 gem install bundler jekyll
 bundler install
 ```
